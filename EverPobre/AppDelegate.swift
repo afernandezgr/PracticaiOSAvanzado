@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import CoreData
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -15,7 +16,15 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-        // Override point for customization after application launch.
+       
+        
+        window = UIWindow()
+        window?.makeKeyAndVisible()
+        
+        let viewController = NoteTableViewController()
+        window?.rootViewController = viewController.wrappedInNavigation()
+     
+        
         return true
     }
 
@@ -25,8 +34,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidEnterBackground(_ application: UIApplication) {
-        // Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
-        // If your application supports background execution, this method is called instead of applicationWillTerminate: when the user quits.
+        
+        let context = CoreDataManager.shared.persistentContainer.viewContext
+        do {
+            try context.save()
+        } catch let saveErr {
+            print("Fallo salvando note:", saveErr)
+        }
+        
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
