@@ -7,15 +7,19 @@
 //
 
 import UIKit
+import CoreLocation
+import MapKit
 
-class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate {
+class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, CLLocationManagerDelegate {
 
     var note: Note? {
         didSet {
         
             nameNotebookTextField.text = note?.notebook?.title
             nameNoteTextField.text = note?.title
-            noteTextView.text = note?.content
+            
+            
+     //       noteTextView.text = note?.content
             
 //
 //            if let imageData = company?.imageData {
@@ -35,19 +39,21 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     var relativePoint: CGPoint!
     var topImgConstraint: NSLayoutConstraint!
     var leftImgConstraint: NSLayoutConstraint!
-
+    var map : MKMapView!
+    let locationManager = CLLocationManager()
 
     // MARK: - Components UI
 
+    var images : [UIImageView] = []
     
-    let imageView : UIImageView = {
-        let imageView = UIImageView()
-        imageView.contentMode = .scaleAspectFill
-        imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.isUserInteractionEnabled = true
-        imageView.backgroundColor = .red
-        return imageView
-    }()
+    
+//    let imageView : UIImageView = {
+//        let imageView = UIImageView()
+//        imageView.contentMode = .scaleAspectFill
+//        imageView.translatesAutoresizingMaskIntoConstraints = false
+//        imageView.isUserInteractionEnabled = true
+//        return imageView
+//    }()
    
     let nameNotebookLabel: UILabel = {
         let label = UILabel()
@@ -108,7 +114,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     let noteTextView: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.backgroundColor = UIColor.gray
+        textView.backgroundColor = .green
         textView.text = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda."
         return textView
     }()
@@ -116,16 +122,34 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        
         setupUI()
         setupNavigationBar()
         view.backgroundColor = .white
         self.dateLimitTextField.addTarget(self, action: #selector(textFieldTouched), for: UIControlEvents.editingDidBegin)
         self.datePicker.addTarget(self, action: #selector(datePickerChanged), for: UIControlEvents.valueChanged)
 
-        let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(userMoveImage))
-        imageView.addGestureRecognizer(moveViewGesture)
+//        let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(userMoveImage))
+//        imageView.addGestureRecognizer(moveViewGesture)
+
+        
     }
     
+    
+    override func viewDidLayoutSubviews()
+    {
+        for imageView in images{
+            
+            var rect = view.convert(imageView.frame, to: noteTextView)
+            rect = rect.insetBy(dx: -15, dy: -15)
+            
+            let paths = UIBezierPath(rect: rect)
+            noteTextView.textContainer.exclusionPaths = [paths]
+            
+        }
+        //print (noteTextView.textContainer.exclusionPaths)
+    }
     
     private func setupNavigationBar()
     {
@@ -139,7 +163,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
         let headerView = UIView()
         view.addSubview(headerView)
-        headerView.backgroundColor = .lightBlue
+        headerView.backgroundColor = .tealColor
         headerView.translatesAutoresizingMaskIntoConstraints = false
         headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
         headerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
@@ -198,34 +222,31 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
         
         let backView = UIView()
+        backView.tag = 1
         view.addSubview(backView)
         backView.translatesAutoresizingMaskIntoConstraints = false
-        backView.backgroundColor = .yellow
         backView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
         backView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
         backView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        backView.heightAnchor.constraint(equalToConstant: 350).isActive = true
+        backView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
         
-        
+      
         backView.addSubview(noteTextView)
-        noteTextView.topAnchor.constraint(equalTo: backView.topAnchor, constant: 2).isActive = true
+        noteTextView.topAnchor.constraint(equalTo: backView.topAnchor, constant: 1).isActive = true
         noteTextView.leftAnchor.constraint(equalTo: backView.leftAnchor).isActive = true
         noteTextView.rightAnchor.constraint(equalTo: backView.rightAnchor).isActive = true
-        noteTextView.heightAnchor.constraint(equalToConstant: 200).isActive = true
+        noteTextView.bottomAnchor.constraint(equalTo: backView.bottomAnchor).isActive = true
         
-//        backView.addSubview(imageView)
-//
-        topImgConstraint = NSLayoutConstraint(item: imageView, attribute: .top, relatedBy: .equal, toItem: noteTextView, attribute: .top, multiplier: 1, constant: 20)
-//
-//
-      leftImgConstraint = NSLayoutConstraint(item: imageView, attribute: .left, relatedBy: .equal, toItem: noteTextView, attribute: .left, multiplier: 1, constant: 20)
-//
-//        imageView.addConstraints([topImgConstraint,leftImgConstraint])
         
-//        imageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-//        imageView.widthAnchor.constraint(equalToConstant: 100).isActive = true
-//        imageView.centerXAnchor.constraint(equalTo: backView.centerXAnchor).isActive = true
-//        imageView.centerYAnchor.constraint(equalTo: backView.centerYAnchor).isActive = true
+        
+//        view.addSubview(imageView)
+//        topImgConstraint = NSLayoutConstraint(item: imageView, attribute: .top, relatedBy: .equal, toItem: noteTextView, attribute: .top, multiplier: 1, constant: 20)
+//        leftImgConstraint = NSLayoutConstraint(item: imageView, attribute: .left, relatedBy: .equal, toItem: noteTextView, attribute: .left, multiplier: 1, constant: 20)
+//        var imgConstraints = [NSLayoutConstraint(item: imageView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 100)]
+//        imgConstraints.append(NSLayoutConstraint(item: imageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 150))
+//        imgConstraints.append(contentsOf: [topImgConstraint,leftImgConstraint])
+//        view.addConstraints(imgConstraints)
+        
         
     }
 
@@ -254,46 +275,29 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         present(actionSheetAlert, animated: true, completion: nil)
     }
     
-    @objc func userMoveImage(longPressGesture:UILongPressGestureRecognizer)
-    {
-        switch longPressGesture.state {
-        case .began:
-            closeKeyboard()
-            relativePoint = longPressGesture.location(in: longPressGesture.view)
-            UIView.animate(withDuration: 0.1, animations: {
-                self.imageView.transform = CGAffineTransform.init(scaleX: 1.2, y: 1.2)
-            })
-            
-        case .changed:
-            let location = longPressGesture.location(in: noteTextView)
-            
-            leftImgConstraint.constant = location.x - relativePoint.x
-            topImgConstraint.constant = location.y - relativePoint.y
-            
-        case .ended, .cancelled:
-            
-            UIView.animate(withDuration: 0.1, animations: {
-                self.imageView.transform = CGAffineTransform.init(scaleX: 1, y: 1)
-            })
-            
-        default:
-            break
-        }
-        
-    }
-    
-    
   
     
+//    override func viewDidLayoutSubviews()
+//    {
+//        if let viewBack = view.viewWithTag(1) {
+//            var rect = viewBack.convert(imageView.frame, to: noteTextView)
+//            rect = rect.insetBy(dx: -15, dy: -15)
+//            let paths = UIBezierPath(rect: rect)
+//            noteTextView.textContainer.exclusionPaths = [paths]
+//
+//        } else { return }
+//        print(noteTextView.textContainer.exclusionPaths)
+//    }
+  
+  
     
     @objc func closeKeyboard()
     {
         
-        
-//        if noteTextView.isFirstResponder
-//        {
-//            noteTextView.resignFirstResponder()
-//        }
+        if noteTextView.isFirstResponder
+        {
+            noteTextView.resignFirstResponder()
+        }
 //        else if titleTextField.isFirstResponder
 //        {
 //            titleTextField.resignFirstResponder()
@@ -336,10 +340,62 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
         let image = info[UIImagePickerControllerOriginalImage] as! UIImage
         
-        imageView.image = image
+        addImageToNote(image: image)
         
+        //imageView.image = image
         picker.dismiss(animated: true, completion: nil)
         
     }
    
+    
+    func addImageToNote(image: UIImage){
+        let newImageView = UIImageView()
+        newImageView.image = image
+        view.addSubview(newImageView)
+       
+        newImageView.contentMode = .scaleAspectFill
+        newImageView.translatesAutoresizingMaskIntoConstraints = false
+        newImageView.isUserInteractionEnabled = true
+        topImgConstraint = NSLayoutConstraint(item: newImageView, attribute: .top, relatedBy: .equal, toItem: noteTextView, attribute: .top, multiplier: 1, constant: 20)
+        leftImgConstraint = NSLayoutConstraint(item: newImageView, attribute: .left, relatedBy: .equal, toItem: noteTextView, attribute: .left, multiplier: 1, constant: 20)
+        var imgConstraints = [NSLayoutConstraint(item: newImageView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 100)]
+        imgConstraints.append(NSLayoutConstraint(item: newImageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 150))
+     
+        imgConstraints.append(contentsOf: [topImgConstraint,leftImgConstraint])
+        view.addConstraints(imgConstraints)
+        
+        let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(userMoveImage))
+        newImageView.addGestureRecognizer(moveViewGesture)
+
+        images.append(newImageView)
+    }
+
+    @objc func userMoveImage(longPressGesture:UILongPressGestureRecognizer)
+    {
+    
+        
+        switch longPressGesture.state {
+        case .began:
+            closeKeyboard()
+            relativePoint = longPressGesture.location(in: longPressGesture.view)
+            UIView.animate(withDuration: 0.1, animations: {
+                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1.2, y: 1.2)
+            })
+            
+        case .changed:
+            let location = longPressGesture.location(in: noteTextView)
+            
+            leftImgConstraint.constant = location.x - relativePoint.x
+            topImgConstraint.constant = location.y - relativePoint.y
+            
+        case .ended, .cancelled:
+            
+            UIView.animate(withDuration: 0.1, animations: {
+                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1, y: 1)
+            })
+            
+        default:
+            break
+        }
+    }
 }
