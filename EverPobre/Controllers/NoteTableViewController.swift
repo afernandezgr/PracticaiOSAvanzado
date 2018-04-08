@@ -137,7 +137,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return fetchedResultController.sections!.count
+        return (fetchedResultController.fetchedObjects?.count)! //fetchedResultController.sections!.count
     }
 
 

@@ -19,7 +19,7 @@
 		919CD97D2074173E005033F6 /* NotebookCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919CD97C2074173E005033F6 /* NotebookCell.swift */; };
 		919CD97F20755809005033F6 /* NoteTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919CD97E20755809005033F6 /* NoteTableViewController.swift */; };
 		919CD981207558A5005033F6 /* NoteCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919CD980207558A5005033F6 /* NoteCell.swift */; };
-		91AE605920773A7200F1EB2F /* NoteViewControllerDraft.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91AE605820773A7200F1EB2F /* NoteViewControllerDraft.swift */; };
+		91D5BAF82078C03C00D65BD8 /* UINavigationController+Additions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D5BAF72078C03C00D65BD8 /* UINavigationController+Additions.swift */; };
 		91FCA7872077E54D000B0CFF /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91FCA7862077E54D000B0CFF /* NoteViewController.swift */; };
 /* End PBXBuildFile section */
 
@@ -38,7 +38,7 @@
 		919CD97C2074173E005033F6 /* NotebookCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotebookCell.swift; sourceTree = "<group>"; };
 		919CD97E20755809005033F6 /* NoteTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteTableViewController.swift; sourceTree = "<group>"; };
 		919CD980207558A5005033F6 /* NoteCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteCell.swift; sourceTree = "<group>"; };
-		91AE605820773A7200F1EB2F /* NoteViewControllerDraft.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewControllerDraft.swift; sourceTree = "<group>"; };
+		91D5BAF72078C03C00D65BD8 /* UINavigationController+Additions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UINavigationController+Additions.swift"; sourceTree = "<group>"; };
 		91FCA7862077E54D000B0CFF /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -108,6 +108,7 @@
 			children = (
 				919CD97720740F43005033F6 /* UIColors.swift */,
 				919CD97920741057005033F6 /* UIViewController+Additions.swift */,
+				91D5BAF72078C03C00D65BD8 /* UINavigationController+Additions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -118,7 +119,6 @@
 				919CD97E20755809005033F6 /* NoteTableViewController.swift */,
 				919CD97C2074173E005033F6 /* NotebookCell.swift */,
 				919CD980207558A5005033F6 /* NoteCell.swift */,
-				91AE605820773A7200F1EB2F /* NoteViewControllerDraft.swift */,
 				91FCA7862077E54D000B0CFF /* NoteViewController.swift */,
 			);
 			path = Controllers;
@@ -199,8 +199,8 @@
 				919CD97D2074173E005033F6 /* NotebookCell.swift in Sources */,
 				919CD97820740F43005033F6 /* UIColors.swift in Sources */,
 				919CD97A20741057005033F6 /* UIViewController+Additions.swift in Sources */,
-				91AE605920773A7200F1EB2F /* NoteViewControllerDraft.swift in Sources */,
 				919CD97220740835005033F6 /* EverPobre.xcdatamodeld in Sources */,
+				91D5BAF82078C03C00D65BD8 /* UINavigationController+Additions.swift in Sources */,
 				919CD981207558A5005033F6 /* NoteCell.swift in Sources */,
 				919CD9742074085E005033F6 /* CoreDataManager.swift in Sources */,
 				91FCA7872077E54D000B0CFF /* NoteViewController.swift in Sources */,
