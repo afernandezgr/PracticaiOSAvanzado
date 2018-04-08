@@ -42,18 +42,14 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     var map : MKMapView!
     let locationManager = CLLocationManager()
 
+//    var panRecognizer: UIPanGestureRecognizer?
+//    var pinchRecognizer: UIPinchGestureRecognizer?
+//    var rotateRecognizer: UIRotationGestureRecognizer?
+//
     // MARK: - Components UI
 
     var images : [UIImageView] = []
     
-    
-//    let imageView : UIImageView = {
-//        let imageView = UIImageView()
-//        imageView.contentMode = .scaleAspectFill
-//        imageView.translatesAutoresizingMaskIntoConstraints = false
-//        imageView.isUserInteractionEnabled = true
-//        return imageView
-//    }()
    
     let nameNotebookLabel: UILabel = {
         let label = UILabel()
@@ -122,17 +118,12 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        
+
         setupUI()
         setupNavigationBar()
         view.backgroundColor = .white
         self.dateLimitTextField.addTarget(self, action: #selector(textFieldTouched), for: UIControlEvents.editingDidBegin)
         self.datePicker.addTarget(self, action: #selector(datePickerChanged), for: UIControlEvents.valueChanged)
-
-//        let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(userMoveImage))
-//        imageView.addGestureRecognizer(moveViewGesture)
-
         
     }
     
@@ -148,7 +139,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             noteTextView.textContainer.exclusionPaths = [paths]
             
         }
-        //print (noteTextView.textContainer.exclusionPaths)
+        
     }
     
     private func setupNavigationBar()
@@ -156,6 +147,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         let photoBarButton = UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(catchPhoto))
         let mapBarButton = UIBarButtonItem(title: "Map", style: .done, target: self, action: #selector(addLocation))
         
+        navigationItem.title = "Note"
         navigationItem.rightBarButtonItems = [photoBarButton, mapBarButton]
      }
     
@@ -238,16 +230,6 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         noteTextView.bottomAnchor.constraint(equalTo: backView.bottomAnchor).isActive = true
         
         
-        
-//        view.addSubview(imageView)
-//        topImgConstraint = NSLayoutConstraint(item: imageView, attribute: .top, relatedBy: .equal, toItem: noteTextView, attribute: .top, multiplier: 1, constant: 20)
-//        leftImgConstraint = NSLayoutConstraint(item: imageView, attribute: .left, relatedBy: .equal, toItem: noteTextView, attribute: .left, multiplier: 1, constant: 20)
-//        var imgConstraints = [NSLayoutConstraint(item: imageView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 100)]
-//        imgConstraints.append(NSLayoutConstraint(item: imageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 150))
-//        imgConstraints.append(contentsOf: [topImgConstraint,leftImgConstraint])
-//        view.addConstraints(imgConstraints)
-        
-        
     }
 
     @objc func catchPhoto()
@@ -277,18 +259,6 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     
   
     
-//    override func viewDidLayoutSubviews()
-//    {
-//        if let viewBack = view.viewWithTag(1) {
-//            var rect = viewBack.convert(imageView.frame, to: noteTextView)
-//            rect = rect.insetBy(dx: -15, dy: -15)
-//            let paths = UIBezierPath(rect: rect)
-//            noteTextView.textContainer.exclusionPaths = [paths]
-//
-//        } else { return }
-//        print(noteTextView.textContainer.exclusionPaths)
-//    }
-  
   
     
     @objc func closeKeyboard()
@@ -364,13 +334,23 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         imgConstraints.append(contentsOf: [topImgConstraint,leftImgConstraint])
         view.addConstraints(imgConstraints)
         
-        let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(userMoveImage))
+        
+        
+        //let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(handlePan))
+    
+        let moveViewGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         newImageView.addGestureRecognizer(moveViewGesture)
+
+        let pinchViewGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch))
+        newImageView.addGestureRecognizer(pinchViewGesture)
+
+        let rotateViewGesture = UIRotationGestureRecognizer(target: self, action: #selector(handleRotate))       
+        newImageView.addGestureRecognizer(rotateViewGesture)
 
         images.append(newImageView)
     }
 
-    @objc func userMoveImage(longPressGesture:UILongPressGestureRecognizer)
+    @objc func handleMoveImage(longPressGesture:UILongPressGestureRecognizer)
     {
     
         
@@ -398,4 +378,34 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             break
         }
     }
+
+    
+    // handle UIPanGestureRecognizer
+    @objc func handlePan(recognizer: UIPanGestureRecognizer) {
+        let gview = recognizer.view
+        if recognizer.state == .began || recognizer.state == .changed {
+            let translation = recognizer.translation(in: gview?.superview)
+            gview?.center = CGPoint(x: (gview?.center.x)! + translation.x, y: (gview?.center.y)! + translation.y)
+            recognizer.setTranslation(CGPoint.zero, in: gview?.superview)
+        }
+    }
+    
+    // handle UIPinchGestureRecognizer
+    @objc func handlePinch(recognizer: UIPinchGestureRecognizer) {
+        if recognizer.state == .began || recognizer.state == .changed {
+            recognizer.view?.transform = (recognizer.view?.transform.scaledBy(x: recognizer.scale, y: recognizer.scale))!
+            recognizer.scale = 1.0
+        }
+    }
+    
+    // handle UIRotationGestureRecognizer
+    @objc func handleRotate(recognizer: UIRotationGestureRecognizer) {
+        if recognizer.state == .began || recognizer.state == .changed {
+            recognizer.view?.transform = (recognizer.view?.transform.rotated(by: recognizer.rotation))!
+            recognizer.rotation = 0.0
+        }
+    }
+    
+  
+    
 }
