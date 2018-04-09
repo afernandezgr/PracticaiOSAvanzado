@@ -124,18 +124,17 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
-        self.locationManager.requestWhenInUseAuthorization()
         self.locationManager.delegate = self
         self.locationManager.startUpdatingLocation()
-        
+        self.locationManager.requestWhenInUseAuthorization()
+  
         let madridLocation = CLLocation(latitude:40.41889 , longitude: -3.69194)
         self.mapView.setCenter(madridLocation.coordinate, animated: true)
         
         setupUI()
         setupNavigationBar()
         view.backgroundColor = .white
-
+        
     }
     
     
