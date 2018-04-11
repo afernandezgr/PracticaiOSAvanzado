@@ -14,10 +14,11 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     
     var fetchedResultController : NSFetchedResultsController<Note>!
     
+    var currentDefaultNotebook: Notebook?
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //self.notes = fetchNotes()
+      
         fetchNotes()
         tableView.register(NoteCell.self, forCellReuseIdentifier: "cellId")
         tableView.register(NotebookCell.self, forHeaderFooterViewReuseIdentifier: "CustomHeader")
@@ -31,9 +32,27 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         tableView.separatorColor = .white
         navigationItem.title = "Notebooks"
     
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewNote))
+        //navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewNote))
         
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "tools"),  style: UIBarButtonItemStyle.plain, target: self, action: #selector(optionsNote))
+
         navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: self, action: #selector(handleReset))
+    }
+    
+    
+    @objc private func optionsNote(){
+    
+    
+    
+    let modalNoteViewController = ModalNoteViewController()
+    modalNoteViewController.currentDefaultNotebook = currentDefaultNotebook
+        
+    let navController = UINavigationController(rootViewController: modalNoteViewController)
+    
+   // createCompanyController.delegate = self
+    
+    present(navController, animated: true, completion: nil)
+    
     }
     
     @objc private func addNewNote(){
@@ -115,6 +134,11 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! NoteCell
         let note = fetchedResultController.object(at: indexPath)
         cell.note = note
+        
+        if (note.notebook?.defaultNotebook)!{
+            currentDefaultNotebook=note.notebook
+        }
+        
         return cell
     }
     
@@ -177,7 +201,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
                                        sectionNameKeyPath: "notebook.title",
                                        cacheName: "dict")
         fetchedResultController.delegate = self
-        
+        fetchRequest.fetchBatchSize = 25
         do {
             try fetchedResultController.performFetch()  //context.fetch(fetchRequest)
             //return notes

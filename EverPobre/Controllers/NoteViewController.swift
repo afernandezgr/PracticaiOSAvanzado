@@ -35,8 +35,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     }
     
     var relativePoint: CGPoint!
-    var topImgConstraint: NSLayoutConstraint!
-    var leftImgConstraint: NSLayoutConstraint!
+   
     var map : MKMapView!
     let locationManager = CLLocationManager()
 
@@ -108,7 +107,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.font = UIFont.systemFont(ofSize: 12)
-  
+        //textView.backgroundColor = .yellow
         textView.text = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda."
         return textView
     }()
@@ -141,13 +140,13 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     override func viewDidLayoutSubviews()
     {
         for imageView in images {
-            
+
             var rect = view.convert(imageView.frame, to: noteTextView)
             rect = rect.insetBy(dx: -15, dy: -15)
-            
+
             let paths = UIBezierPath(rect: rect)
             noteTextView.textContainer.exclusionPaths = [paths]
-            
+
         }
         
     }
@@ -167,13 +166,13 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         let headerView = UIView()
         view.addSubview(headerView)
         headerView.backgroundColor = .tealColor
-        headerView.translatesAutoresizingMaskIntoConstraints = false
-        headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-        headerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        headerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        headerView.heightAnchor.constraint(equalToConstant: 180).isActive = true
-        
-        
+//        headerView.translatesAutoresizingMaskIntoConstraints = false
+//        headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
+//        headerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+//        headerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+//        headerView.heightAnchor.constraint(equalToConstant: 180).isActive = true
+//        
+//        
         
         headerView.addSubview(nameNotebookLabel)
         nameNotebookLabel.topAnchor.constraint(equalTo: headerView.topAnchor,constant: 4).isActive = true
@@ -229,24 +228,24 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         mapView.widthAnchor.constraint(equalToConstant: 150).isActive = true
         mapView.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
+        headerView.tag = 1
+//        let backView = UIView()
+//        backView.tag = 1
+//        view.addSubview(backView)
+//        backView.translatesAutoresizingMaskIntoConstraints = false
+//        backView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
+//        backView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
+//        backView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+//        backView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+
+
+        headerView.addSubview(noteTextView)
+        noteTextView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 81).isActive = true
+        noteTextView.leftAnchor.constraint(equalTo: headerView.leftAnchor).isActive = true
+        noteTextView.rightAnchor.constraint(equalTo: headerView.rightAnchor).isActive = true
+        noteTextView.heightAnchor.constraint(equalToConstant: 150).isActive = true
         
-        let backView = UIView()
-        backView.tag = 1
-        view.addSubview(backView)
-        backView.translatesAutoresizingMaskIntoConstraints = false
-        backView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
-        backView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        backView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-        backView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-        
-      
-        backView.addSubview(noteTextView)
-        noteTextView.topAnchor.constraint(equalTo: backView.topAnchor, constant: 1).isActive = true
-        noteTextView.leftAnchor.constraint(equalTo: backView.leftAnchor).isActive = true
-        noteTextView.rightAnchor.constraint(equalTo: backView.rightAnchor).isActive = true
-        noteTextView.bottomAnchor.constraint(equalTo: backView.bottomAnchor).isActive = true
-        
-      
+        self.view = headerView
     }
 
     @objc func catchPhoto()
@@ -281,10 +280,10 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     @objc func closeKeyboard()
     {
         
-        if noteTextView.isFirstResponder
-        {
-            noteTextView.resignFirstResponder()
-        }
+//        if noteTextView.isFirstResponder
+//        {
+//            noteTextView.resignFirstResponder()
+//        }
 //        else if titleTextField.isFirstResponder
 //        {
 //            titleTextField.resignFirstResponder()
@@ -294,7 +293,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     
     @objc func addLocation()
     {
-        mapView.isHidden = false
+        mapView.isHidden =  !mapView.isHidden
 
     }
     
@@ -320,28 +319,36 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         addImageToNote(image: image)
         
         //imageView.image = image
-        picker.dismiss(animated: true, completion: nil)
         
+        picker.dismiss(animated: true, completion: nil)
     }
    
     
     func addImageToNote(image: UIImage){
         let newImageView = UIImageView()
         newImageView.image = image
-        
-        view.addSubview(newImageView)
-       
         newImageView.contentMode = .scaleAspectFill
         newImageView.translatesAutoresizingMaskIntoConstraints = false
         newImageView.isUserInteractionEnabled = true
+        
+        view.addSubview(newImageView)
+        
+        var topImgConstraint = NSLayoutConstraint()
+        var leftImgConstraint = NSLayoutConstraint()
+      
+        
         topImgConstraint = NSLayoutConstraint(item: newImageView, attribute: .top, relatedBy: .equal, toItem: noteTextView, attribute: .top, multiplier: 1, constant: 20)
         leftImgConstraint = NSLayoutConstraint(item: newImageView, attribute: .left, relatedBy: .equal, toItem: noteTextView, attribute: .left, multiplier: 1, constant: 20)
+        
+        
+            
         var imgConstraints = [NSLayoutConstraint(item: newImageView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 100)]
         imgConstraints.append(NSLayoutConstraint(item: newImageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 150))
-     
         imgConstraints.append(contentsOf: [topImgConstraint,leftImgConstraint])
-        view.addConstraints(imgConstraints)
         
+        view.addConstraints(imgConstraints)
+
+   
         //let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(handlePan))
         let moveViewGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         newImageView.addGestureRecognizer(moveViewGesture)
@@ -355,42 +362,46 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         images.append(newImageView)
     }
 
-    @objc func handleMoveImage(longPressGesture:UILongPressGestureRecognizer)
-    {
-    
-        switch longPressGesture.state {
-        case .began:
-            closeKeyboard()
-            relativePoint = longPressGesture.location(in: longPressGesture.view)
-            UIView.animate(withDuration: 0.1, animations: {
-                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1.2, y: 1.2)
-            })
-            
-        case .changed:
-            let location = longPressGesture.location(in: noteTextView)
-            
-            leftImgConstraint.constant = location.x - relativePoint.x
-            topImgConstraint.constant = location.y - relativePoint.y
-            
-        case .ended, .cancelled:
-            
-            UIView.animate(withDuration: 0.1, animations: {
-                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1, y: 1)
-            })
-            
-        default:
-            break
-        }
-    }
+//    @objc func handleMoveImage(longPressGesture:UILongPressGestureRecognizer)
+//    {
+//
+//        switch longPressGesture.state {
+//        case .began:
+//            closeKeyboard()
+//            relativePoint = longPressGesture.location(in: longPressGesture.view)
+//            UIView.animate(withDuration: 0.1, animations: {
+//                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1.2, y: 1.2)
+//            })
+//
+//        case .changed:
+//            let location = longPressGesture.location(in: noteTextView)
+//
+//            leftImgConstraint.constant = location.x - relativePoint.x
+//            topImgConstraint.constant = location.y - relativePoint.y
+//
+//        case .ended, .cancelled:
+//
+//            UIView.animate(withDuration: 0.1, animations: {
+//                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1, y: 1)
+//            })
+//
+//        default:
+//            break
+//        }
+//    }
 
     
     // handle UIPanGestureRecognizer
     @objc func handlePan(recognizer: UIPanGestureRecognizer) {
         let gview = recognizer.view
         if recognizer.state == .began || recognizer.state == .changed {
-            let translation = recognizer.translation(in: gview?.superview)
+//            let translation = recognizer.translation(in: gview?.superview)
+    
+            let translation = recognizer.translation(in: gview)
+            
             gview?.center = CGPoint(x: (gview?.center.x)! + translation.x, y: (gview?.center.y)! + translation.y)
-            recognizer.setTranslation(CGPoint.zero, in: gview?.superview)
+            //recognizer.setTranslation(CGPoint.zero, in: gview?.superview)
+            recognizer.setTranslation(CGPoint.zero, in: gview)
         }
     }
     

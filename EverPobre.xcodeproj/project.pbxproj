@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		9188A1D4207C7E1000ABB265 /* ModalNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9188A1D3207C7E1000ABB265 /* ModalNoteViewController.swift */; };
 		919CD95C20740591005033F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919CD95B20740591005033F6 /* AppDelegate.swift */; };
 		919CD96120740591005033F6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 919CD95F20740591005033F6 /* Main.storyboard */; };
 		919CD96320740593005033F6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 919CD96220740593005033F6 /* Assets.xcassets */; };
@@ -24,6 +25,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		9188A1D3207C7E1000ABB265 /* ModalNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalNoteViewController.swift; sourceTree = "<group>"; };
 		919CD95820740591005033F6 /* EverPobre.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EverPobre.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		919CD95B20740591005033F6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		919CD96020740591005033F6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
@@ -120,6 +122,7 @@
 				919CD97C2074173E005033F6 /* NotebookCell.swift */,
 				919CD980207558A5005033F6 /* NoteCell.swift */,
 				91FCA7862077E54D000B0CFF /* NoteViewController.swift */,
+				9188A1D3207C7E1000ABB265 /* ModalNoteViewController.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -197,6 +200,7 @@
 			files = (
 				919CD97F20755809005033F6 /* NoteTableViewController.swift in Sources */,
 				919CD97D2074173E005033F6 /* NotebookCell.swift in Sources */,
+				9188A1D4207C7E1000ABB265 /* ModalNoteViewController.swift in Sources */,
 				919CD97820740F43005033F6 /* UIColors.swift in Sources */,
 				919CD97A20741057005033F6 /* UIViewController+Additions.swift in Sources */,
 				919CD97220740835005033F6 /* EverPobre.xcdatamodeld in Sources */,
