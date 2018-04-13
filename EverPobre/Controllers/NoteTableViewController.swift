@@ -16,6 +16,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     
     var currentDefaultNotebook: Notebook?
     
+    // MARK: Life Cycle
     override func viewDidLoad() {
         super.viewDidLoad()
       
@@ -25,6 +26,12 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         setupUI()
     }
     
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        self.tableView.reloadData()
+    }
+
     
     private func setupUI(){
         tableView.backgroundColor = .tealColor
@@ -36,7 +43,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "tools"),  style: UIBarButtonItemStyle.plain, target: self, action: #selector(optionsNote))
 
-        navigationItem.leftBarButtonItem = UIBarButtonItem(title: "Reset", style: .plain, target: self, action: #selector(handleReset))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "plus"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleNewNote))
     }
     
     
@@ -49,7 +56,6 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         
     let navController = UINavigationController(rootViewController: modalNoteViewController)
     
-   // createCompanyController.delegate = self
     
     present(navController, animated: true, completion: nil)
     
@@ -90,32 +96,25 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     }
     
     
-    @objc private func handleReset() {
-        print("Intentando eliminar todos los core data objects")
-   
- 
-//        let context = CoreDataManager.shared.persistentContainer.viewContext
-//
-//        let batchDeleteRequest = NSBatchDeleteRequest(fetchRequest: Notebook.fetchRequest())
-//
-//        do {
-//            try context.execute(batchDeleteRequest)
-//
-//
-//
-//            var indexPathsToRemove = [IndexPath]()
-//
-//            for (index, _) in notes.enumerated() {
-//                let indexPath = IndexPath(row: index, section: 0)
-//                indexPathsToRemove.append(indexPath)
-//            }
-//            notes.removeAll()
-//            tableView.deleteRows(at: indexPathsToRemove, with: .left)
-//
-//        } catch let delErr {
-//            print("Fallo el borrado de objetos de Core Data:", delErr)
-//        }
-//
+    @objc private func handleNewNote() {
+        print("Intentando añadir nueva nota")
+        
+        if let currentDefaultNotebook = currentDefaultNotebook {
+        
+                let noteViewController = NoteViewController()
+                noteViewController.currentDefaultNotebook = currentDefaultNotebook
+                navigationController?.pushViewController(noteViewController, animated: true)
+        
+        } else {
+                showError(title: "Not default notebook selected", message: "You need a default notebook to be selected")
+        }
+        
+    }
+    
+    private func showError(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        present(alertController, animated: true, completion: nil)
     }
     
     
@@ -125,6 +124,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let noteViewController = NoteViewController()
         noteViewController.note = fetchedResultController.object(at: indexPath)
+        noteViewController.currentDefaultNotebook = currentDefaultNotebook
         navigationController?.pushViewController(noteViewController, animated: true)
     }
     
@@ -161,7 +161,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     
     // MARK: - Table view data source
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return (fetchedResultController.fetchedObjects?.count)! //fetchedResultController.sections!.count
+        return fetchedResultController.sections!.count //(fetchedResultController.fetchedObjects?.count)! //fetchedResultController.sections!.count
     }
 
 
@@ -183,6 +183,32 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         return 60
     }
     
+    
+    override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
+        
+        let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (_, indexPath) in
+            let note = self.fetchedResultController.object(at: indexPath) 
+           // self.tableView.deleteRows(at: [indexPath], with: .automatic)
+            
+            let context = CoreDataManager.shared.persistentContainer.viewContext
+           
+            //self.tableView.deleteRows(at: [indexPath], with: .automatic)
+            
+            context.delete(note)
+            
+            do {
+                try context.save()
+            } catch let saveErr {
+                print("Failed to delete note:", saveErr)
+            }
+        }
+        deleteAction.backgroundColor = UIColor.lightRed
+        
+       
+        return [deleteAction]
+    }
+    
+    
     func fetchNotes() { //}-> [Note] {
         let context = CoreDataManager.shared.persistentContainer.viewContext
         
@@ -199,12 +225,12 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
             NSFetchedResultsController(fetchRequest: fetchRequest,
                                        managedObjectContext: context,
                                        sectionNameKeyPath: "notebook.title",
-                                       cacheName: "dict")
-        fetchedResultController.delegate = self
+                                       cacheName: nil)
+       
         fetchRequest.fetchBatchSize = 25
         do {
             try fetchedResultController.performFetch()  //context.fetch(fetchRequest)
-            //return notes
+             fetchedResultController.delegate = self
         } catch let fetchErr {
             print("Fallo recuperado notes:", fetchErr)
             //return []
@@ -212,8 +238,12 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
+        fetchNotes()
         tableView.reloadData()
     }
+    
+   
+   
 
 }
 

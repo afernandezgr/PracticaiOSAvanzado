@@ -8,6 +8,7 @@
 
 import UIKit
 import CoreLocation
+import CoreData
 import MapKit
 
 class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, CLLocationManagerDelegate {
@@ -17,9 +18,17 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
             nameNotebookTextField.text = note?.notebook?.title
             nameNoteTextField.text = note?.title
+            noteTextView.text = note?.content
             
+            if let dateLimit = note?.dateLimit {
+                let formatter = DateFormatter()
+                formatter.dateFormat = "dd/MM/yyyy"
+                dateLimitTextField.text = formatter.string(from: dateLimit)
+            }
             
-     //       noteTextView.text = note?.content
+//            let yourDate: Date? = formatter.date(from: myString)
+//            formatter.dateFormat = "dd-MMM-yyyy"
+//            print(yourDate!)
             
 //
 //            if let imageData = company?.imageData {
@@ -33,6 +42,8 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             //dateLimitTextField.text = note?.dateLimit
         }
     }
+    
+    var currentDefaultNotebook: Notebook?
     
     var relativePoint: CGPoint!
    
@@ -123,6 +134,10 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if note == nil {
+            nameNotebookTextField.text = currentDefaultNotebook?.title
+        }
+        
         self.locationManager.delegate = self
         self.locationManager.startUpdatingLocation()
         self.locationManager.requestWhenInUseAuthorization()
@@ -155,9 +170,11 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     {
         let photoBarButton = UIBarButtonItem(barButtonSystemItem: .camera, target: self, action: #selector(catchPhoto))
         let mapBarButton = UIBarButtonItem(image: #imageLiteral(resourceName: "map")  , style: UIBarButtonItemStyle.plain, target: self, action: #selector(addLocation))
+        let saveButton = UIBarButtonItem(image: #imageLiteral(resourceName: "save") , style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleSave))
+        
         
         navigationItem.title = "Note"
-        navigationItem.rightBarButtonItems = [photoBarButton, mapBarButton]
+        navigationItem.rightBarButtonItems = [saveButton, photoBarButton, mapBarButton]
 //         navigationItem.rightBarButtonItems = [photoBarButton]
      }
     
@@ -302,13 +319,88 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
  
     
     @objc private func handleSave() {
+        
+        
         if note == nil {
-            //createCompany()
+            createNewNote()
         } else {
-            //saveCompanyChanges()
+             saveNoteChanges()
         }
     }
     
+    private func createNewNote() {
+        
+        let context = CoreDataManager.shared.persistentContainer.viewContext
+        
+        let newNote = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
+
+        //validate date
+        
+        guard let dateLimitTextField = dateLimitTextField.text else { return }
+        if !dateLimitTextField.isEmpty{
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd/MM/yyyy"
+            
+            guard let dateLimit = dateFormatter.date(from: dateLimitTextField) else {
+                showError(title: "Bad format date", message: "Date format is not correct (dd/MM/yyyy")
+                return
+            }
+            newNote.dateLimit = dateLimit
+        }
+        newNote.notebook = currentDefaultNotebook
+        newNote.notebook?.title = nameNotebookTextField.text
+        newNote.title = nameNoteTextField.text
+        newNote.content = noteTextView.text
+        
+        do {
+            try context.save()
+            navigationController?.popViewController(animated: true)
+        } catch let saveErr {
+            print("Fail updating notebook:", saveErr)
+        }
+        
+        
+    }
+    
+    private func saveNoteChanges(){
+        
+        let context = CoreDataManager.shared.persistentContainer.viewContext
+        
+        //validate date
+        
+        guard let dateLimitTextField = dateLimitTextField.text else { return }
+        if !dateLimitTextField.isEmpty{
+            
+            let dateFormatter = DateFormatter()
+            dateFormatter.dateFormat = "dd/MM/yyyy"
+            
+            guard let dateLimit = dateFormatter.date(from: dateLimitTextField) else {
+                showError(title: "Bad format date", message: "Date format is not correct (dd/MM/yyyy")
+                return
+            }
+            note?.dateLimit = dateLimit
+        }
+        note?.notebook?.title = nameNotebookTextField.text
+        note?.title = nameNoteTextField.text
+        
+        note?.content = noteTextView.text
+        
+        do {
+            try context.save()
+            navigationController?.popViewController(animated: true)
+        } catch let saveErr {
+            print("Fail updating notebook:", saveErr)
+        }
+    
+    
+    }
+    
+    private func showError(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
   
    
     // MARK: Image Picker Delegate

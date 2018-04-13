@@ -22,9 +22,12 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         }
     }
     
-    var newDefaultNotebook : Notebook?
 
-    var fetchedResultController : NSFetchedResultsController<Notebook>!
+    var fetchedResultControllerDefault : NSFetchedResultsController<Notebook>!
+    var fetchedResultControllerDelete : NSFetchedResultsController<Notebook>!
+    var fetchedResultControllerTransfer : NSFetchedResultsController<Notebook>!
+    
+    
     let tabBarCnt = UITabBarController()
     
     let createNotebookVC = UIViewController()
@@ -75,10 +78,51 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         return textField
     }()
     
-    let notebookPicker : UIPickerView = {
+    let notebookDefaultPicker : UIPickerView = {
         let picker = UIPickerView()
         picker.translatesAutoresizingMaskIntoConstraints = false
+   
         return picker
+    }()
+    
+    let nameNotebookToDeleteLabel: UILabel = {
+        let label = UILabel()
+        label.text = "Select Notebook to delete:"
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        return label
+    }()
+    
+    let notebookToDeletePicker : UIPickerView = {
+        let picker = UIPickerView()
+        picker.translatesAutoresizingMaskIntoConstraints = false
+        
+        return picker
+    }()
+    
+    let nameNotebookToDeleteAskLabel: UILabel = {
+        let label = UILabel()
+        label.text = "If you want to assign notes in the notebook to another notebook please mark this option and select:"
+        label.textAlignment = .justified
+        label.numberOfLines = 4
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.font = UIFont.boldSystemFont(ofSize: 16)
+        return label
+    }()
+    
+    let notebookToTransferPicker : UIPickerView = {
+        let picker = UIPickerView()
+        picker.translatesAutoresizingMaskIntoConstraints = false
+        
+        return picker
+    }()
+    
+    let notebookSwitchTransfer : UISwitch = {
+       let switcher = UISwitch()
+        switcher.translatesAutoresizingMaskIntoConstraints = false
+        switcher.isOn = false
+        switcher.tintColor = .darkBlue
+        return switcher
     }()
     
     // MARK: - Picker Notebook default management
@@ -88,7 +132,16 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        return fetchedResultController.sections!.count
+        if pickerView == notebookDefaultPicker {
+            return fetchedResultControllerDefault.fetchedObjects!.count
+        }
+        else if pickerView == notebookToDeletePicker {
+            return fetchedResultControllerDelete.fetchedObjects!.count
+        }
+        else if pickerView == notebookToTransferPicker {
+            return fetchedResultControllerTransfer.fetchedObjects!.count
+        }
+        return 0
     }
     
     func pickerView(_ pickerView: UIPickerView, widthForComponent component: Int) -> CGFloat {
@@ -102,19 +155,19 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
         
         let indexPath = IndexPath(row: row,  section: 0)
-        let notebook  = self.fetchedResultController.object(at: indexPath as IndexPath) as Notebook
+        var notebook = Notebook()
+        if pickerView == notebookDefaultPicker {
+            notebook   = self.fetchedResultControllerDefault.object(at: indexPath as IndexPath) as Notebook
+        }
+        else if  pickerView == notebookToDeletePicker {
+            notebook  = self.fetchedResultControllerDelete.object(at: indexPath as IndexPath) as Notebook
+        }
+        else if  pickerView == notebookToTransferPicker {
+            notebook  = self.fetchedResultControllerTransfer.object(at: indexPath as IndexPath) as Notebook
+        }
         return notebook.title
     }
     
-    
-    func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-
-        let indexPath = IndexPath(row: row,  section: 0)
-        let notebook  = self.fetchedResultController.object(at: indexPath as IndexPath) as Notebook
-        
-        newDefaultNotebook = notebook
-    
-    }
 
     // MARK: - Cycle life
    
@@ -133,17 +186,21 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         swipeGesture.direction = .down
         
         
-        notebookPicker.dataSource = self
-        notebookPicker.delegate = self
+        notebookDefaultPicker.dataSource = self
+        notebookDefaultPicker.delegate = self
         
-        fetchNotesbooks()
+        notebookToDeletePicker.dataSource = self
+        notebookToDeletePicker.delegate = self
+        
+        notebookToTransferPicker.dataSource = self
+        notebookToTransferPicker.delegate = self
+        
+        fetchNotesbooksDefault()
+        fetchNotesbooksDelete()
+        fetchNotesbooksTransfer()
     }
 
-    override func viewWillAppear(_ animated: Bool) {
-        
-//       fetchNotesbooks()
-    }
-    
+
     
     // MARK: - UI Interaction
 
@@ -160,6 +217,7 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
     
    
     @objc func handleCancelModal() {
+        
         dismiss(animated: true, completion: nil)
     }
 
@@ -180,7 +238,7 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
             notebook.setValue(false, forKey: "defaultNotebook")
             
             let note = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
-            note.title = "New note"
+            note.title = "New note +++3"
             note.notebook = notebook
             
             do {
@@ -192,12 +250,39 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
             
         }
         else if tabBarCnt.selectedIndex == 1 { //delete
+            var indexPath = IndexPath(row:  notebookToDeletePicker.selectedRow(inComponent: 0),  section: 0)
+            let deleteNotebook  = self.fetchedResultControllerDelete.object(at: indexPath as IndexPath) as Notebook
+           
+            if (notebookSwitchTransfer.isOn){
+                indexPath = IndexPath(row:  notebookToTransferPicker.selectedRow(inComponent: 0),  section: 0)
+                let transferNotebook  = self.fetchedResultControllerTransfer.object(at: indexPath as IndexPath) as Notebook
+                
+                if deleteNotebook == transferNotebook {
+                    showError(title: "Warning!", message: "Notebook to delete and notebook to transfer notes is the same")
+                    return
+                }
+                for note in deleteNotebook.notes! {
+                    (note as! Note).notebook = transferNotebook
+                }
+            }
             
-        }
-            
+            context.delete(deleteNotebook)
+            do {
+                try context.save()
+                dismiss(animated: true, completion: nil)
+            } catch let saveErr {
+                print("Fail setting new default notebook:", saveErr)
+            }
+         }
         else if tabBarCnt.selectedIndex == 2 { //setdefault
-            currentDefaultNotebook?.defaultNotebook = false
-            newDefaultNotebook?.defaultNotebook = true
+            if let currentNotebook = currentDefaultNotebook {
+                 currentNotebook.defaultNotebook = false
+            }
+            
+            let indexPath = IndexPath(row: notebookDefaultPicker.selectedRow(inComponent: 0),  section: 0)
+            let newDefaultNotebook  = self.fetchedResultControllerDefault.object(at: indexPath as IndexPath) as Notebook
+            newDefaultNotebook.defaultNotebook = true
+                    
             do {
                 try context.save()
                 dismiss(animated: true, completion: nil)
@@ -224,6 +309,8 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .plain, target: self, action: #selector(handleSave))
     }
     
+    
+    
     func setupUIcreateNotebookVC(){
         createNotebookVC.title = "Create"
         createNotebookVC.view.backgroundColor =  .lightBlue
@@ -249,7 +336,40 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         deleteNotebookVC.title = "Delete"
         deleteNotebookVC.view.backgroundColor =  .lightBlue
         
-    
+        deleteNotebookVC.view.addSubview(nameNotebookToDeleteLabel)
+        nameNotebookToDeleteLabel.topAnchor.constraint(equalTo: deleteNotebookVC.view.topAnchor,constant: 4).isActive = true
+        nameNotebookToDeleteLabel.leftAnchor.constraint(equalTo: deleteNotebookVC.view.leftAnchor, constant: 16).isActive = true
+        nameNotebookToDeleteLabel.widthAnchor.constraint(equalToConstant: 300).isActive = true
+        nameNotebookToDeleteLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
+     
+        deleteNotebookVC.view.addSubview(notebookToDeletePicker)
+        notebookToDeletePicker.topAnchor.constraint(equalTo: nameNotebookToDeleteLabel.bottomAnchor,constant: 4).isActive = true
+        notebookToDeletePicker.leftAnchor.constraint(equalTo: deleteNotebookVC.view.leftAnchor,constant: 16).isActive = true
+        notebookToDeletePicker.rightAnchor.constraint(equalTo: deleteNotebookVC.view.rightAnchor, constant: -16).isActive = true
+        notebookToDeletePicker.heightAnchor.constraint(equalToConstant: 150).isActive = true
+
+        
+        
+        deleteNotebookVC.view.addSubview(nameNotebookToDeleteAskLabel)
+        nameNotebookToDeleteAskLabel.topAnchor.constraint(equalTo: notebookToDeletePicker.bottomAnchor,constant: 4).isActive = true
+        nameNotebookToDeleteAskLabel.leftAnchor.constraint(equalTo: deleteNotebookVC.view.leftAnchor, constant: 16).isActive = true
+        nameNotebookToDeleteAskLabel.widthAnchor.constraint(equalToConstant: 250).isActive = true
+        nameNotebookToDeleteAskLabel.heightAnchor.constraint(equalToConstant: 70).isActive = true
+        
+        deleteNotebookVC.view.addSubview(notebookSwitchTransfer)
+        notebookSwitchTransfer.topAnchor.constraint(equalTo: notebookToDeletePicker.bottomAnchor,constant: 4).isActive = true
+        notebookSwitchTransfer.leftAnchor.constraint(equalTo: nameNotebookToDeleteAskLabel.rightAnchor, constant: 8).isActive = true
+        notebookSwitchTransfer.rightAnchor.constraint(equalTo: deleteNotebookVC.view.rightAnchor, constant: -16).isActive = true
+        notebookSwitchTransfer.widthAnchor.constraint(equalToConstant: 50).isActive = true
+        notebookSwitchTransfer.centerYAnchor.constraint(equalTo: nameNotebookToDeleteAskLabel.centerYAnchor).isActive = true
+
+        deleteNotebookVC.view.addSubview(notebookToTransferPicker)
+        notebookToTransferPicker.topAnchor.constraint(equalTo: nameNotebookToDeleteAskLabel.bottomAnchor,constant: 4).isActive = true
+        notebookToTransferPicker.leftAnchor.constraint(equalTo: deleteNotebookVC.view.leftAnchor,constant: 16).isActive = true
+        notebookToTransferPicker.rightAnchor.constraint(equalTo: deleteNotebookVC.view.rightAnchor, constant: -16).isActive = true
+        notebookToTransferPicker.heightAnchor.constraint(equalToConstant: 150).isActive = true
+
+
     }
     
     
@@ -278,11 +398,11 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         nameNotebookSelectLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
         
-        setDefaultNotebookVC.view.addSubview(notebookPicker)
-        notebookPicker.topAnchor.constraint(equalTo: nameNotebookSelectLabel.bottomAnchor,constant: 4).isActive = true
-        notebookPicker.leftAnchor.constraint(equalTo: setDefaultNotebookVC.view.leftAnchor,constant: 16).isActive = true
-        notebookPicker.rightAnchor.constraint(equalTo: setDefaultNotebookVC.view.rightAnchor, constant: -16).isActive = true
-        notebookPicker.heightAnchor.constraint(equalToConstant: 150).isActive = true
+        setDefaultNotebookVC.view.addSubview(notebookDefaultPicker)
+        notebookDefaultPicker.topAnchor.constraint(equalTo: nameNotebookSelectLabel.bottomAnchor,constant: 4).isActive = true
+        notebookDefaultPicker.leftAnchor.constraint(equalTo: setDefaultNotebookVC.view.leftAnchor,constant: 16).isActive = true
+        notebookDefaultPicker.rightAnchor.constraint(equalTo: setDefaultNotebookVC.view.rightAnchor, constant: -16).isActive = true
+        notebookDefaultPicker.heightAnchor.constraint(equalToConstant: 150).isActive = true
         
     }
 
@@ -301,9 +421,39 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         self.view.addSubview(tabBarCnt.view)
     }
 
+
     // MARK: - Fecth Data CD
 
-    func fetchNotesbooks() {
+    
+    func fetchNotesbooksDefault() {
+        let context = CoreDataManager.shared.persistentContainer.viewContext
+
+        let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
+
+        let sortByTitle = NSSortDescriptor(key: "title", ascending: true)
+
+        fetchRequest.sortDescriptors = [sortByTitle]
+        fetchRequest.fetchBatchSize = 25
+        fetchedResultControllerDefault =
+            NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: title, cacheName: nil)
+
+
+        let predicate = NSPredicate(format: "defaultNotebook = false")  //avoid current default notebook
+        fetchRequest.predicate = predicate
+
+        fetchedResultControllerDefault.delegate = self
+
+        do {
+            try fetchedResultControllerDefault.performFetch()
+            print(fetchedResultControllerDefault)
+        } catch let fetchErr {
+            print("Failing recovering notebooks:", fetchErr)
+
+        }
+        self.notebookDefaultPicker.reloadAllComponents()
+    }
+    
+    func fetchNotesbooksDelete() {
         let context = CoreDataManager.shared.persistentContainer.viewContext
         
         let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
@@ -312,23 +462,45 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         
         fetchRequest.sortDescriptors = [sortByTitle]
         fetchRequest.fetchBatchSize = 25
-        fetchedResultController =
+        fetchedResultControllerDelete =
             NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: title, cacheName: nil)
-
-        let predicate = NSPredicate(format: "defaultNotebook == false")  //avoid current default notebook
-        fetchRequest.predicate = predicate
         
-
-        fetchedResultController.delegate = self
+    
+        fetchedResultControllerDelete.delegate = self
         
         do {
-            try fetchedResultController.performFetch()
-            print(fetchedResultController)
+            try fetchedResultControllerDelete.performFetch()
+           
         } catch let fetchErr {
-            print("Failint recovering notebooks:", fetchErr)
+            print("Failing recovering notebooks:", fetchErr)
             
         }
-         self.notebookPicker.reloadAllComponents()
+        self.notebookToDeletePicker.reloadAllComponents()
     }
-   
+    
+    func fetchNotesbooksTransfer() {
+        let context = CoreDataManager.shared.persistentContainer.viewContext
+        
+        let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
+        
+        let sortByTitle = NSSortDescriptor(key: "title", ascending: true)
+        
+        fetchRequest.sortDescriptors = [sortByTitle]
+        fetchRequest.fetchBatchSize = 25
+        fetchedResultControllerTransfer =
+            NSFetchedResultsController(fetchRequest: fetchRequest, managedObjectContext: context, sectionNameKeyPath: title, cacheName: nil)
+        
+        
+        fetchedResultControllerTransfer.delegate = self
+        
+        do {
+            try fetchedResultControllerTransfer.performFetch()
+            
+        } catch let fetchErr {
+            print("Failing recovering notebooks:", fetchErr)
+            
+        }
+        self.notebookToTransferPicker.reloadAllComponents()
+    }
+    
 }
