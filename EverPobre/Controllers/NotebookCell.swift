@@ -14,7 +14,6 @@ class NotebookCell : UITableViewHeaderFooterView {
         didSet {
             nameNotebookLabel.text = notebook?.title
             defaultNoteBookImage.isHidden = !(notebook?.defaultNotebook)!
-            
         }
     }
     
@@ -31,11 +30,6 @@ class NotebookCell : UITableViewHeaderFooterView {
         imageView.contentMode = .scaleAspectFill
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.tintColor = .white
-        
-//        imageView.layer.cornerRadius = 20
-//        imageView.clipsToBounds = true
-//        imageView.layer.borderColor = UIColor.darkBlue.cgColor
-//        imageView.layer.borderWidth = 1
         return imageView
     }()
     
