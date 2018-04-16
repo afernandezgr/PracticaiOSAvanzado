@@ -49,7 +49,35 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
                 mapView.isHidden = false
             }
             
-            
+            if let imagesNote = note?.images {
+                for case let image as ImageNote in imagesNote {
+                    let newImageView = UIImageView()
+                    
+                    newImageView.image = UIImage(data: image.imageData!)
+                    newImageView.contentMode = .scaleAspectFill
+                    newImageView.translatesAutoresizingMaskIntoConstraints = false
+                    newImageView.isUserInteractionEnabled = true
+                    
+                    view.viewWithTag(1010)?.addSubview(newImageView)
+                    newImageView.topAnchor.constraint(equalTo: noteTextView.topAnchor, constant: CGFloat(image.posY)).isActive = true
+                    newImageView.leftAnchor.constraint(equalTo: noteTextView.leftAnchor, constant: CGFloat(image.posX)).isActive = true
+                    newImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
+                    newImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+                    
+                    let moveViewGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
+                    newImageView.addGestureRecognizer(moveViewGesture)
+                    
+                    let pinchViewGesture = UIPinchGestureRecognizer(target: self, action: #selector(handlePinch))
+                    newImageView.addGestureRecognizer(pinchViewGesture)
+                    
+                    let rotateViewGesture = UIRotationGestureRecognizer(target: self, action: #selector(handleRotate))
+                    newImageView.addGestureRecognizer(rotateViewGesture)
+
+                   images.append(newImageView)
+                   avoidImageTextOverlap(newImageView)
+                }
+            }
+//
 //            if let imageData = company?.imageData {
 //                companyImageView.image = UIImage(data: imageData)
 //                setupCircularImageStyle()
@@ -179,17 +207,19 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     }
     
     
-    override func viewDidLayoutSubviews()
+    func avoidImageTextOverlap(imageView: UIView)
     {
-        for imageView in images {
+       
+        // noteTextView.textContainer.exclusionPaths.removeAll()
+       // for imageView in images {
 
-            var rect = view.convert(imageView.frame, to: noteTextView)
+            var rect = noteTextView.convert(imageView.frame, to: noteTextView)
             rect = rect.insetBy(dx: -15, dy: -15)
 
-            let paths = UIBezierPath(rect: rect)
-            noteTextView.textContainer.exclusionPaths = [paths]
+            let path = UIBezierPath(rect: rect)
+            noteTextView.textContainer.exclusionPaths=[path]
 
-        }
+       // }
         
     }
     
@@ -288,6 +318,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
 
 
         view.addSubview(noteTextView)
+        noteTextView.tag = 1010
         noteTextView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 81).isActive = true
         noteTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
         noteTextView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
@@ -358,8 +389,9 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
         let newNote = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
 
-        //validate date
+        //save general attributes
         
+        //validate date
         guard let dateLimitTextField = dateLimitTextField.text else { return }
         if !dateLimitTextField.isEmpty{
             
@@ -377,12 +409,19 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         newNote.title = nameNoteTextField.text
         newNote.content = noteTextView.text
     
+        //save location
         if !mapView.isHidden{
             note?.longitude = mapView.centerCoordinate.longitude
             note?.latitude = mapView.centerCoordinate.latitude
         }
+        else {
+            note?.longitude = 0
+            note?.latitude = 0
+        }
         
-        if (note?.tags?.count)! > 0{
+        //save tags
+       
+        if let count = note?.tags?.count, count > 0 {
             deleteAllTags(note: note!)
         }
         var newTag : Tag
@@ -391,7 +430,22 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             newTag.name = tag
             newTag.note = note
         }
-
+        
+        // save images
+        var newImage : ImageNote
+        for imageView in images {
+            newImage = NSEntityDescription.insertNewObject(forEntityName: "ImageNote", into: context) as! ImageNote
+            
+            if let imageData = UIImageJPEGRepresentation(imageView.image!, 0.8) {
+                newImage.imageData = imageData
+            }
+            
+            newImage.posX = Double(imageView.frame.origin.x)
+            newImage.posY = Double(imageView.frame.origin.y)
+            newImage.note = note
+            
+        }
+        
         do {
             try context.save()
             navigationController?.popViewController(animated: true)
@@ -406,6 +460,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
         let context = CoreDataManager.shared.persistentContainer.viewContext
         
+        //save general attributes
         //validate date
         
         guard let dateLimitTextField = dateLimitTextField.text else { return }
@@ -425,12 +480,17 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         note?.title = nameNoteTextField.text
         note?.content = noteTextView.text
         
-        
+        //save location
         if !mapView.isHidden{
             note?.longitude = mapView.centerCoordinate.longitude
             note?.latitude = mapView.centerCoordinate.latitude
         }
+        else {
+            note?.longitude = 0
+            note?.latitude = 0
+        }
         
+        //save tags
         if (note?.tags?.count)! > 0{
             deleteAllTags(note: note!)
         }
@@ -441,6 +501,24 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             newTag.note = note
         }
 
+        //save images
+        if (images.count) > 0{
+            deleteAllImages(note: note!)
+        }
+        
+        var newImage : ImageNote
+        for imageView in images {
+            newImage = NSEntityDescription.insertNewObject(forEntityName: "ImageNote", into: context) as! ImageNote
+            
+            if let imageData = UIImageJPEGRepresentation(imageView.image!, 0.8) {
+                newImage.imageData = imageData
+            }
+            
+            newImage.posX = Double(imageView.frame.origin.x)
+            newImage.posY = Double(imageView.frame.origin.y)
+            newImage.note = note
+        }
+        
         
         do {
             try context.save()
@@ -468,6 +546,24 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         }
         
     }
+    
+    private func deleteAllImages(note : Note)
+    {
+        let context = CoreDataManager.shared.persistentContainer.viewContext
+        
+        if let images = note.images{
+            for image in images {
+                context.delete(image as! ImageNote)
+            }
+            do {
+                try context.save()
+            } catch let saveErr {
+                print("Fail deleting images:", saveErr)
+            }
+        }
+        
+    }
+    
     
     private func extractTagsFromText(text : String) -> [String]
     {
@@ -512,28 +608,13 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         newImageView.translatesAutoresizingMaskIntoConstraints = false
         newImageView.isUserInteractionEnabled = true
         
-        view.addSubview(newImageView)
+        view.viewWithTag(1010)?.addSubview(newImageView)
         newImageView.topAnchor.constraint(equalTo: noteTextView.topAnchor, constant: 50).isActive = true
         newImageView.leftAnchor.constraint(equalTo: noteTextView.leftAnchor, constant: 50).isActive = true
         newImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
         newImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
-        //        var topImgConstraint = NSLayoutConstraint()
-        //        var leftImgConstraint = NSLayoutConstraint()
         
         
-//        topImgConstraint = NSLayoutConstraint(item: newImageView, attribute: .top, relatedBy: .equal, toItem: noteTextView, attribute: .top, multiplier: 1, constant: view.safeAreaLayoutGuide.centerYAnchor)
-//        leftImgConstraint = NSLayoutConstraint(item: newImageView, attribute: .left, relatedBy: .equal, toItem: noteTextView, attribute: .left, multiplier: 1, constant: 20)
-
-//
-//
-//        var imgConstraints = [NSLayoutConstraint(item: newImageView, attribute: .width, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 100)]
-//        imgConstraints.append(NSLayoutConstraint(item: newImageView, attribute: .height, relatedBy: .equal, toItem: nil, attribute: .notAnAttribute, multiplier: 0, constant: 150))
-//        imgConstraints.append(contentsOf: [topImgConstraint,leftImgConstraint])
-////
-//        view.addConstraints(imgConstraints)
-//
-//
-        //let moveViewGesture = UILongPressGestureRecognizer(target: self, action: #selector(handlePan))
         let moveViewGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
         newImageView.addGestureRecognizer(moveViewGesture)
 
@@ -583,11 +664,10 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             let translation = recognizer.translation(in: recognizer.view)
 
             //let translation = recognizer.translation(in: noteTextView)
-
-
             recognizer.view?.center = CGPoint(x: (recognizer.view?.center.x)! + translation.x, y: (recognizer.view?.center.y)! + translation.y)
             recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
-
+            //viewDidLayoutSubviews()
+            avoidImageTextOverlap(imageView: recognizer.view!)
         }
     }
 
