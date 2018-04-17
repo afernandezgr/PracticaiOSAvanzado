@@ -21,7 +21,7 @@ class NoteCell : UITableViewCell {
         let label = UILabel()
         label.text = "Notename"
         label.font = UIFont.boldSystemFont(ofSize: 16)
-        label.textColor = .white
+        label.textColor = .lightGray
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
     }()
@@ -33,10 +33,10 @@ class NoteCell : UITableViewCell {
         backgroundColor = . darkBlue
         
         addSubview(nameNoteLabel)
-        nameNoteLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 8).isActive = true
-        nameNoteLabel.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        nameNoteLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -8).isActive = true
-        nameNoteLabel.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
+        nameNoteLabel.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
+        nameNoteLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
+        nameNoteLabel.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -16).isActive = true
+        nameNoteLabel.bottomAnchor.constraint(equalTo: safeAreaLayoutGuide.bottomAnchor).isActive = true
     }
     
     required init?(coder aDecoder: NSCoder) {

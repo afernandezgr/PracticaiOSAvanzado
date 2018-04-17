@@ -41,20 +41,19 @@ class NotebookCell : UITableViewHeaderFooterView {
         self.backgroundView?.backgroundColor = .lightBlue
         
         addSubview(nameNotebookLabel)
-        nameNotebookLabel.leftAnchor.constraint(equalTo: leftAnchor, constant: 8).isActive = true
-        nameNotebookLabel.topAnchor.constraint(equalTo: topAnchor).isActive = true
-        nameNotebookLabel.rightAnchor.constraint(equalTo: rightAnchor, constant: -38).isActive = true
+        nameNotebookLabel.leftAnchor.constraint(equalTo: safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
+        nameNotebookLabel.topAnchor.constraint(equalTo: safeAreaLayoutGuide.topAnchor).isActive = true
+        nameNotebookLabel.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -58).isActive = true
         nameNotebookLabel.bottomAnchor.constraint(equalTo: bottomAnchor).isActive = true
         
         //print("\(notebook?.title) \(notebook?.defaultNotebook)")
         
         addSubview(defaultNoteBookImage)
-        defaultNoteBookImage.leftAnchor.constraint(equalTo: nameNotebookLabel.rightAnchor, constant: 4).isActive = true
+        defaultNoteBookImage.leftAnchor.constraint(equalTo: nameNotebookLabel.rightAnchor, constant: 16).isActive = true
+        defaultNoteBookImage.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -16).isActive = true
+        defaultNoteBookImage.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor).isActive = true
         defaultNoteBookImage.heightAnchor.constraint(equalToConstant: 30).isActive = true
         defaultNoteBookImage.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        defaultNoteBookImage.rightAnchor.constraint(equalTo: rightAnchor, constant: -4).isActive = true
-        defaultNoteBookImage.centerYAnchor.constraint(equalTo: centerYAnchor).isActive = true
-        
         
     }
     

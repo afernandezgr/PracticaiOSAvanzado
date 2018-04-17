@@ -22,45 +22,19 @@ struct CoreDataManager {
         return container
     }()
 
-    func fetchNotebooks() -> [Notebook] {
-        let context = persistentContainer.viewContext
-        
-        let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
-        do {
-            let notebooks = try context.fetch(fetchRequest)
-            return notebooks
-        } catch let fetchErr {
-            print("Fallo recuperado notebooks:", fetchErr)
-            return []
-        }
-    }
-
-//    func fetchNotes() -> [Note] {
+//    func fetchNotebooks() -> [Notebook] {
 //        let context = persistentContainer.viewContext
 //        
-//        let fetchRequest = NSFetchRequest<Note>(entityName: "Note")
-//
-//        
-//        let sortByDefaultFirst = NSSortDescriptor(key: "note.defaultNotebook", ascending: true)
-//        
-//        let sortByTitle = NSSortDescriptor(key: "note.title", ascending: true)
-//       
-//        fetchRequest.sortDescriptors = [sortByDefaultFirst,sortByTitle]
-//        
-//        fetchedResultsController =
-//            NSFetchedResultsController(fetchRequest: fetchRequest,
-//                                       managedObjectContext: context,
-//                                       sectionNameKeyPath: "letter.letterName",
-//                                       cacheName: "dict")
-//        
+//        let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
 //        do {
-//            let notes = try context.fetch(fetchRequest)
-//            return notes
+//            let notebooks = try context.fetch(fetchRequest)
+//            return notebooks
 //        } catch let fetchErr {
-//            print("Fallo recuperado notes:", fetchErr)
+//            print("Fallo recuperado notebooks:", fetchErr)
 //            return []
 //        }
 //    }
 
-    
+
+  
 }

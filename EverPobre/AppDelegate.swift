@@ -7,15 +7,18 @@
 //
 
 import UIKit
-import CoreData
+
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     var window: UIWindow?
 
+    var noteListViewController : NoteTableViewController?
+    var detailNoteViewController : NoteDetailViewController?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+        
         UINavigationBar.appearance().tintColor = .white
         UINavigationBar.appearance().isTranslucent = false
         UINavigationBar.appearance().barTintColor = .darkBlue
@@ -26,8 +29,22 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         window = UIWindow()
         window?.makeKeyAndVisible()
         
-        let viewController = NoteTableViewController()
-        window?.rootViewController = viewController.wrappedInNavigation()
+        noteListViewController = NoteTableViewController()
+        detailNoteViewController = NoteDetailViewController()
+        
+        noteListViewController?.delegate = detailNoteViewController
+        
+    
+        let splitViewController = UISplitViewController()
+        splitViewController.delegate = self
+        splitViewController.viewControllers = [noteListViewController?.wrappedInNavigation(), detailNoteViewController?.wrappedInNavigation()] as! [UIViewController]
+      
+        // Asignamos el rootVC
+        window?.rootViewController = splitViewController
+        
+        
+//        let viewController = NoteTableViewController()
+//        window?.rootViewController = viewController.wrappedInNavigation()
      
         
         return true
@@ -65,3 +82,18 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
 }
 
+
+extension AppDelegate: UISplitViewControllerDelegate {
+    
+    //en caso de que colapse especificamos el VC a mostrar
+    func primaryViewController(forCollapsing splitViewController: UISplitViewController) -> UIViewController? {
+        return splitViewController.viewControllers.first
+    }
+    
+    func splitViewController(_ splitViewController: UISplitViewController, collapseSecondary sencondaryViewController: UIViewController, onto primaryViewController: UIViewController) -> Bool {
+        return true
+    }
+    
+  
+   
+}

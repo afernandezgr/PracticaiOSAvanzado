@@ -14,4 +14,10 @@ extension UIViewController {
     func wrappedInNavigation() -> UINavigationController {
         return UINavigationController(rootViewController: self)
     }
+    
+    private func showError(title: String, message: String) {
+        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        present(alertController, animated: true, completion: nil)
+    }
 }

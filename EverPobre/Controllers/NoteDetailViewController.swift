@@ -11,7 +11,7 @@ import CoreLocation
 import CoreData
 import MapKit
 
-class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, CLLocationManagerDelegate {
+class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, CLLocationManagerDelegate {
 
     var topImgConstraint = NSLayoutConstraint()
     var leftImgConstraint = NSLayoutConstraint()
@@ -74,7 +74,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
                     newImageView.addGestureRecognizer(rotateViewGesture)
 
                    images.append(newImageView)
-                   avoidImageTextOverlap(newImageView)
+                    avoidImageTextOverlap(imageView: newImageView)
                 }
             }
 //
@@ -171,11 +171,18 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     }()
     
     
+    let spaceView : UIView = {
+        let spaceView = UIView()
+        spaceView.backgroundColor = .darkGray
+        spaceView.translatesAutoresizingMaskIntoConstraints = false
+        return spaceView
+    }()
+    
     let noteTextView: UITextView = {
         let textView = UITextView()
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.font = UIFont.systemFont(ofSize: 12)
-        textView.backgroundColor = .lightGray
+        textView.backgroundColor = .white
         textView.text = "Lorem ipsum dolor sit er elit lamet, consectetaur cillium adipisicing pecu, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum. Nam liber te conscient to factor tum poen legum odioque civiuda."
         return textView
     }()
@@ -202,7 +209,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
        
         setupUI()
         setupNavigationBar()
-        view.backgroundColor = .white
+        view.backgroundColor = .lightGray
         
     }
     
@@ -236,19 +243,10 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     
     private func setupUI() {
         
-//        let headerView = UIView()
-//        view.addSubview(headerView)
-//        headerView.tag = 1
-//        headerView.translatesAutoresizingMaskIntoConstraints = false
-//        headerView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor).isActive = true
-//        headerView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-//        headerView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-//        headerView.heightAnchor.constraint(equalToConstant: 180).isActive = true
-
         
         view.addSubview(nameNotebookLabel)
         nameNotebookLabel.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor,constant: 4).isActive = true
-        nameNotebookLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        nameNotebookLabel.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
         nameNotebookLabel.widthAnchor.constraint(equalToConstant: 80).isActive = true
         nameNotebookLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
@@ -261,7 +259,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
         view.addSubview(nameNoteLabel)
         nameNoteLabel.topAnchor.constraint(equalTo: nameNotebookLabel.bottomAnchor, constant: 2).isActive = true
-        nameNoteLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        nameNoteLabel.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
         nameNoteLabel.widthAnchor.constraint(equalToConstant: 80).isActive = true
         nameNoteLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
@@ -269,13 +267,13 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         view.addSubview(nameNoteTextField)
         nameNoteTextField.topAnchor.constraint(equalTo: nameNotebookLabel.bottomAnchor, constant: 2).isActive = true
         nameNoteTextField.leftAnchor.constraint(equalTo: nameNotebookLabel.rightAnchor).isActive = true
-        nameNoteTextField.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        nameNoteTextField.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         nameNoteTextField.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
         
         view.addSubview(dateLimitLabel)
         dateLimitLabel.topAnchor.constraint(equalTo: nameNoteLabel.bottomAnchor, constant: 2).isActive = true
-        dateLimitLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        dateLimitLabel.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
         dateLimitLabel.widthAnchor.constraint(equalToConstant: 80).isActive = true
         dateLimitLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
@@ -283,12 +281,12 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         view.addSubview(dateLimitTextField)
         dateLimitTextField.topAnchor.constraint(equalTo: nameNoteLabel.bottomAnchor, constant: 2).isActive = true
         dateLimitTextField.leftAnchor.constraint(equalTo: dateLimitLabel.rightAnchor).isActive = true
-        dateLimitTextField.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        dateLimitTextField.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         dateLimitTextField.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
         view.addSubview(tagsLabel)
         tagsLabel.topAnchor.constraint(equalTo: dateLimitLabel.bottomAnchor, constant: 2).isActive = true
-        tagsLabel.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
+        tagsLabel.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
         tagsLabel.widthAnchor.constraint(equalToConstant: 80).isActive = true
         tagsLabel.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
@@ -296,35 +294,31 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         view.addSubview(tagsTextField)
         tagsTextField.topAnchor.constraint(equalTo: dateLimitLabel.bottomAnchor, constant: 2).isActive = true
         tagsTextField.leftAnchor.constraint(equalTo: tagsLabel.rightAnchor).isActive = true
-        tagsTextField.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        tagsTextField.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         tagsTextField.heightAnchor.constraint(equalToConstant: 20).isActive = true
         
         view.addSubview(mapView)
         mapView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 2).isActive = true
-        mapView.leftAnchor.constraint(equalTo: view.leftAnchor, constant: 16).isActive = true
-        mapView.rightAnchor.constraint(equalTo: view.rightAnchor, constant: -16).isActive = true
+        mapView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
+        mapView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -16).isActive = true
         mapView.widthAnchor.constraint(equalToConstant: 150).isActive = true
         mapView.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
       
-//        let backView = UIView()
-//        backView.tag = 1
-//        view.addSubview(backView)
-//        backView.translatesAutoresizingMaskIntoConstraints = false
-//        backView.topAnchor.constraint(equalTo: headerView.bottomAnchor).isActive = true
-//        backView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-//        backView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
-//        backView.bottomAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
-
-
+        view.addSubview(spaceView)
+        spaceView.topAnchor.constraint(equalTo: mapView.bottomAnchor, constant: 2).isActive = true
+        spaceView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+        spaceView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
+        spaceView.heightAnchor.constraint(equalToConstant: 2).isActive = true
+        
+        
         view.addSubview(noteTextView)
         noteTextView.tag = 1010
-        noteTextView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 81).isActive = true
+        noteTextView.topAnchor.constraint(equalTo: spaceView.bottomAnchor, constant: 2).isActive = true
         noteTextView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor).isActive = true
-        noteTextView.leftAnchor.constraint(equalTo: view.leftAnchor).isActive = true
-        noteTextView.rightAnchor.constraint(equalTo: view.rightAnchor).isActive = true
+        noteTextView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
+        noteTextView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         
-        //self.view = headerView
     }
 
     @objc func catchPhoto()
@@ -369,13 +363,10 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     @objc func addLocation()
     {
         mapView.isHidden =  !mapView.isHidden
-
     }
 
     
     @objc private func handleSave() {
-        
-        
         if note == nil {
             createNewNote()
         } else {
@@ -387,9 +378,16 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         
         let context = CoreDataManager.shared.persistentContainer.viewContext
         
+        //save general attributes
+        if nameNoteTextField.text == "" {
+            showError(title: "Name requiered", message: "Please enter note name")
+            return
+        }
+        
         let newNote = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
 
-        //save general attributes
+        
+        
         
         //validate date
         guard let dateLimitTextField = dateLimitTextField.text else { return }
@@ -399,7 +397,7 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             dateFormatter.dateFormat = "dd/MM/yyyy"
             
             guard let dateLimit = dateFormatter.date(from: dateLimitTextField) else {
-                showError(title: "Bad format date", message: "Date format is not correct (dd/MM/yyyy")
+                showError(title: "Bad format date", message: "Date format is not correct. Please use (dd/MM/yyyy)")
                 return
             }
             newNote.dateLimit = dateLimit
@@ -446,6 +444,13 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             
         }
         
+//        let backMOC = CoreDataManager.shared.persistentContainer.viewContext
+//        
+//        backMOC.perform {
+//            let backNote = backMOC.object(with:note?.objectID) as! Note
+//            backNote.content = newContent
+//        }
+//        
         do {
             try context.save()
             navigationController?.popViewController(animated: true)
@@ -538,11 +543,11 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             for tag in tags {
                 context.delete(tag as! Tag)
             }
-            do {
-                try context.save()
-            } catch let saveErr {
-                print("Fail deleting tags:", saveErr)
-            }
+//            do {
+//                try context.save()
+//            } catch let saveErr {
+//                print("Fail deleting tags:", saveErr)
+//            }
         }
         
     }
@@ -555,11 +560,11 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
             for image in images {
                 context.delete(image as! ImageNote)
             }
-            do {
-                try context.save()
-            } catch let saveErr {
-                print("Fail deleting images:", saveErr)
-            }
+//            do {
+//                try context.save()
+//            } catch let saveErr {
+//                print("Fail deleting images:", saveErr)
+//            }
         }
         
     }
@@ -673,8 +678,21 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
 
     // handle UIPinchGestureRecognizer
     @objc func handlePinch(recognizer: UIPinchGestureRecognizer) {
-        if recognizer.state == .began || recognizer.state == .changed {
-            recognizer.view?.transform = (recognizer.view?.transform.scaledBy(x: recognizer.scale, y: recognizer.scale))!
+        if recognizer.state == .changed || recognizer.state == .ended {
+//            var currentScale:CGFloat = 1
+//
+//            var newScale:CGFloat = currentScale * recognizer.scale;
+//            if (newScale < 0.7) {
+//                newScale = 0.7;
+//            }
+//            if (newScale > 1.5) {
+//                newScale = 1.5;
+//            }
+//
+            
+            if (recognizer.scale >= 0.7 && recognizer.scale<=1.3){
+                recognizer.view?.transform = (recognizer.view?.transform.scaledBy(x: recognizer.scale, y: recognizer.scale))!
+            }
             recognizer.scale = 1.0
         }
     }
@@ -682,8 +700,10 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
     // handle UIRotationGestureRecognizer
     @objc func handleRotate(recognizer: UIRotationGestureRecognizer) {
         if recognizer.state == .began || recognizer.state == .changed {
+           
             recognizer.view?.transform = (recognizer.view?.transform.rotated(by: recognizer.rotation))!
             recognizer.rotation = 0.0
+                
         }
     }
     
@@ -693,4 +713,10 @@ class NoteViewController: UIViewController,UIImagePickerControllerDelegate,UINav
         self.mapView.setCenter(location.coordinate, animated: true)
     }
 
+}
+
+extension NoteDetailViewController : NoteTableViewControllerDelegate {
+    func noteTableViewController(_ viewController: NoteTableViewController, didSelectNote note : Note) {
+        self.note = note
+    }
 }

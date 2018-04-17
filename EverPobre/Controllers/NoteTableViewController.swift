@@ -8,13 +8,20 @@
 
 import UIKit
 import CoreData
+
+
+protocol NoteTableViewControllerDelegate: class {
+    // should, will, did
+    func noteTableViewController(_ viewController: NoteTableViewController, didSelectNote note : Note)
+}
+
 class NoteTableViewController: UITableViewController, NSFetchedResultsControllerDelegate {
     
     var notes = [Note]() // array vacio
-    
     var fetchedResultController : NSFetchedResultsController<Note>!
-    
     var currentDefaultNotebook: Notebook?
+    weak var delegate: NoteTableViewControllerDelegate?
+
     
     // MARK: Life Cycle
     override func viewDidLoad() {
@@ -24,6 +31,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         tableView.register(NoteCell.self, forCellReuseIdentifier: "cellId")
         tableView.register(NotebookCell.self, forHeaderFooterViewReuseIdentifier: "CustomHeader")
         setupUI()
+       
     }
     
     
@@ -39,7 +47,6 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         tableView.separatorColor = .white
         navigationItem.title = "Notebooks"
     
-        //navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addNewNote))
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "tools"),  style: UIBarButtonItemStyle.plain, target: self, action: #selector(optionsNote))
 
@@ -48,65 +55,32 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     
     
     @objc private func optionsNote(){
-    
-    
-    
-    let modalNoteViewController = ModalNoteViewController()
-    modalNoteViewController.currentDefaultNotebook = currentDefaultNotebook
+        let modalNoteViewController = ModalNoteViewController()
+        modalNoteViewController.currentDefaultNotebook = currentDefaultNotebook
         
-    let navController = UINavigationController(rootViewController: modalNoteViewController)
-    
-    
-    present(navController, animated: true, completion: nil)
-    
-    }
-    
-    @objc private func addNewNote(){
-        print("Adding new note...")
-        
-        let context = CoreDataManager.shared.persistentContainer.viewContext
-        
-        let notebook = NSEntityDescription.insertNewObject(forEntityName: "Notebook", into: context)  as! Notebook
-        notebook.setValue("Notebook example7", forKey: "title")
-        notebook.setValue(true, forKey: "defaultNotebook")
-        
-        let note = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
-        note.title = "Note 7"
-        note.notebook = notebook
-    
-        
-        //        if let companyImage = companyImageView.image {
-        //            let imageData = UIImageJPEGRepresentation(companyImage, 0.8)
-        //            company.setValue(imageData, forKey: "imageData")
-        //        }
-        
-        // perform the save
-        
-        do {
-            try context.save()
-            
-            // success
-            //            dismiss(animated: true, completion: {
-            //                self.delegate?.didAddCompany(company: company as! Company)
-            //            })
-            
-        } catch let saveErr {
-            print("Fallo salvando note:", saveErr)
-        }
+        let navController = UINavigationController(rootViewController: modalNoteViewController)
+        //navigationController?.pushViewController(navController, animated: true, completion: nil)
+        splitViewController?.viewControllers.first?.present(navController, animated: true)
     }
     
     
     @objc private func handleNewNote() {
-        print("Intentando añadir nueva nota")
-        
+   
         if let currentDefaultNotebook = currentDefaultNotebook {
-        
-                let noteViewController = NoteViewController()
-                noteViewController.currentDefaultNotebook = currentDefaultNotebook
+            
+            let noteViewController = NoteDetailViewController()
+            noteViewController.currentDefaultNotebook = currentDefaultNotebook
+            //navigationController?.pushViewController(noteViewController, animated: true)
+            
+            if UIDevice.current.userInterfaceIdiom == .pad {
+                splitViewController?.showDetailViewController(noteViewController.wrappedInNavigation(), sender: nil)
+            }
+            else
+            {
                 navigationController?.pushViewController(noteViewController, animated: true)
-        
+            }
         } else {
-                showError(title: "Not default notebook selected", message: "You need a default notebook to be selected")
+            showError(title: "Not default notebook selected", message: "You need a default notebook to be selected")
         }
         
     }
@@ -116,16 +90,31 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         present(alertController, animated: true, completion: nil)
     }
-    
+
     
     // MARK: - TableView funcs
 
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        let noteViewController = NoteViewController()
+        let noteViewController = NoteDetailViewController()
         noteViewController.note = fetchedResultController.object(at: indexPath)
         noteViewController.currentDefaultNotebook = currentDefaultNotebook
-        navigationController?.pushViewController(noteViewController, animated: true)
+        
+//        if splitViewController!.isCollapsed {
+//            navigationController?.pushViewController(noteViewController, animated: true)
+//        }
+//
+        
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            splitViewController?.showDetailViewController(noteViewController.wrappedInNavigation(), sender: nil)
+        }
+        else
+        {
+            navigationController?.pushViewController(noteViewController, animated: true)
+        }
+        
+        delegate?.noteTableViewController(self, didSelectNote: noteViewController.note!)
+        
     }
     
     

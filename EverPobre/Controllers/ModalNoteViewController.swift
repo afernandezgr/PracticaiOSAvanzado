@@ -238,7 +238,7 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
             notebook.setValue(false, forKey: "defaultNotebook")
             
             let note = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
-            note.title = "New note +++3"
+            note.title = "My note"
             note.notebook = notebook
             
             do {
@@ -315,8 +315,6 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         createNotebookVC.title = "Create"
         createNotebookVC.view.backgroundColor =  .lightBlue
 
-
-
         createNotebookVC.view.addSubview(nameNotebookLabel)
         nameNotebookLabel.topAnchor.constraint(equalTo: createNotebookVC.view.topAnchor,constant: 4).isActive = true
         nameNotebookLabel.leftAnchor.constraint(equalTo: createNotebookVC.view.leftAnchor, constant: 16).isActive = true
@@ -328,8 +326,6 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         nameNotebookTextField.leftAnchor.constraint(equalTo: createNotebookVC.view.leftAnchor,constant: 16).isActive = true
         nameNotebookTextField.rightAnchor.constraint(equalTo: createNotebookVC.view.rightAnchor, constant: -16).isActive = true
         nameNotebookTextField.heightAnchor.constraint(equalToConstant: 20).isActive = true
-
-        
     }
     
     func setupUIdeleteNotebookVC(){
@@ -348,8 +344,6 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         notebookToDeletePicker.rightAnchor.constraint(equalTo: deleteNotebookVC.view.rightAnchor, constant: -16).isActive = true
         notebookToDeletePicker.heightAnchor.constraint(equalToConstant: 150).isActive = true
 
-        
-        
         deleteNotebookVC.view.addSubview(nameNotebookToDeleteAskLabel)
         nameNotebookToDeleteAskLabel.topAnchor.constraint(equalTo: notebookToDeletePicker.bottomAnchor,constant: 4).isActive = true
         nameNotebookToDeleteAskLabel.leftAnchor.constraint(equalTo: deleteNotebookVC.view.leftAnchor, constant: 16).isActive = true
