@@ -225,55 +225,65 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
     
     @objc func handleSave() {
        
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+        //let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         if tabBarCnt.selectedIndex ==  0 {  //new notebook creation
             
             if (nameNotebookTextField.text?.isEmpty)! {
                 showError(title: "Empty notebook name", message: "You have not entered notebook name.")
                 return
             }
-            
-            let notebook = NSEntityDescription.insertNewObject(forEntityName: "Notebook", into: context)  as! Notebook
-            notebook.setValue(nameNotebookTextField.text, forKey: "title")
-            notebook.setValue(false, forKey: "defaultNotebook")
-            
-            let note = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
-            note.title = "My note"
-            note.notebook = notebook
-            
-            do {
-                try context.save()
-                dismiss(animated: true, completion: nil)
-            } catch let saveErr {
-                print("Fail saving notebook:", saveErr)
+            let noteName = self.nameNotebookTextField.text
+    
+            let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
+            backMOC.performAndWait {
+                let notebook = NSEntityDescription.insertNewObject(forEntityName: "Notebook", into: backMOC)  as! Notebook
+                notebook.setValue(noteName, forKey: "title")
+                notebook.setValue(false, forKey: "defaultNotebook")
+                
+                let note = NSEntityDescription.insertNewObject(forEntityName: "Note", into: backMOC) as! Note
+                note.title = "My note"
+                note.notebook = notebook
+                
+                do {
+                    try backMOC.save()
+                } catch let saveErr {
+                    print("Fail saving notebook:", saveErr)
+                }
             }
+            dismiss(animated: true, completion: nil)
             
         }
         else if tabBarCnt.selectedIndex == 1 { //delete
             var indexPath = IndexPath(row:  notebookToDeletePicker.selectedRow(inComponent: 0),  section: 0)
             let deleteNotebook  = self.fetchedResultControllerDelete.object(at: indexPath as IndexPath) as Notebook
-           
+            
             if (notebookSwitchTransfer.isOn){
                 indexPath = IndexPath(row:  notebookToTransferPicker.selectedRow(inComponent: 0),  section: 0)
-                let transferNotebook  = self.fetchedResultControllerTransfer.object(at: indexPath as IndexPath) as Notebook
-                
-                if deleteNotebook == transferNotebook {
-                    showError(title: "Warning!", message: "Notebook to delete and notebook to transfer notes is the same")
-                    return
-                }
-                for note in deleteNotebook.notes! {
-                    (note as! Note).notebook = transferNotebook
-                }
+            }
+            let transferNotebook  = self.fetchedResultControllerTransfer.object(at: indexPath as IndexPath) as Notebook
+            if (notebookSwitchTransfer.isOn && deleteNotebook == transferNotebook) {
+                showError(title: "Warning!", message: "Notebook to delete and notebook to transfer notes is the same")
+                return
             }
             
-            context.delete(deleteNotebook)
-            do {
-                try context.save()
-                dismiss(animated: true, completion: nil)
-            } catch let saveErr {
-                print("Fail setting new default notebook:", saveErr)
+            let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
+            backMOC.performAndWait{
+                
+                let backNotebookToDelete = backMOC.object(with: deleteNotebook.objectID) as! Notebook
+                let backTransferNotebook = backMOC.object(with: transferNotebook.objectID) as! Notebook
+                backMOC.delete(backNotebookToDelete)
+                for note in backNotebookToDelete.notes! {
+                    (note as! Note).notebook = backTransferNotebook
+                }
+                
+                do {
+                    try backMOC.save()
+                } catch let saveErr {
+                    print("Fail deleting notebook:", saveErr)
+                }
             }
-         }
+            dismiss(animated: true, completion: nil)
+        }
         else if tabBarCnt.selectedIndex == 2 { //setdefault
             if let currentNotebook = currentDefaultNotebook {
                  currentNotebook.defaultNotebook = false
@@ -281,15 +291,20 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
             
             let indexPath = IndexPath(row: notebookDefaultPicker.selectedRow(inComponent: 0),  section: 0)
             let newDefaultNotebook  = self.fetchedResultControllerDefault.object(at: indexPath as IndexPath) as Notebook
-            newDefaultNotebook.defaultNotebook = true
-                    
-            do {
-                try context.save()
-                dismiss(animated: true, completion: nil)
-            } catch let saveErr {
-                print("Fail setting new default notebook:", saveErr)
+           
+            let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
+            backMOC.performAndWait {
+                 let backNewDefaulNotebook = backMOC.object(with: newDefaultNotebook.objectID) as! Notebook
+                backNewDefaulNotebook.defaultNotebook = true
+                do {
+                    try backMOC.save()
+                  } catch let saveErr {
+                    print("Fail setting new default notebook:", saveErr)
+                  }
+                
             }
-            
+            dismiss(animated: true, completion: nil)
+
         }
     }
 
@@ -347,14 +362,14 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
         deleteNotebookVC.view.addSubview(nameNotebookToDeleteAskLabel)
         nameNotebookToDeleteAskLabel.topAnchor.constraint(equalTo: notebookToDeletePicker.bottomAnchor,constant: 4).isActive = true
         nameNotebookToDeleteAskLabel.leftAnchor.constraint(equalTo: deleteNotebookVC.view.leftAnchor, constant: 16).isActive = true
-        nameNotebookToDeleteAskLabel.widthAnchor.constraint(equalToConstant: 250).isActive = true
+        nameNotebookToDeleteAskLabel.widthAnchor.constraint(equalToConstant: 280).isActive = true
         nameNotebookToDeleteAskLabel.heightAnchor.constraint(equalToConstant: 70).isActive = true
         
         deleteNotebookVC.view.addSubview(notebookSwitchTransfer)
         notebookSwitchTransfer.topAnchor.constraint(equalTo: notebookToDeletePicker.bottomAnchor,constant: 4).isActive = true
         notebookSwitchTransfer.leftAnchor.constraint(equalTo: nameNotebookToDeleteAskLabel.rightAnchor, constant: 8).isActive = true
-        notebookSwitchTransfer.rightAnchor.constraint(equalTo: deleteNotebookVC.view.rightAnchor, constant: -16).isActive = true
-        notebookSwitchTransfer.widthAnchor.constraint(equalToConstant: 50).isActive = true
+  //      notebookSwitchTransfer.rightAnchor.constraint(equalTo: deleteNotebookVC.view.rightAnchor, constant: -16).isActive = true
+//        notebookSwitchTransfer.widthAnchor.constraint(equalToConstant: 50).isActive = true
         notebookSwitchTransfer.centerYAnchor.constraint(equalTo: nameNotebookToDeleteAskLabel.centerYAnchor).isActive = true
 
         deleteNotebookVC.view.addSubview(notebookToTransferPicker)
@@ -420,7 +435,7 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
 
     
     func fetchNotesbooksDefault() {
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
 
         let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
 
@@ -448,7 +463,7 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
     }
     
     func fetchNotesbooksDelete() {
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         
         let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
         
@@ -473,7 +488,7 @@ class ModalNoteViewController: UIViewController, UIPickerViewDataSource, UIPicke
     }
     
     func fetchNotesbooksTransfer() {
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         
         let fetchRequest = NSFetchRequest<Notebook>(entityName: "Notebook")
         

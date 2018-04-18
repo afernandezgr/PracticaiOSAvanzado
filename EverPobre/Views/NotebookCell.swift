@@ -49,7 +49,6 @@ class NotebookCell : UITableViewHeaderFooterView {
         //print("\(notebook?.title) \(notebook?.defaultNotebook)")
         
         addSubview(defaultNoteBookImage)
-        defaultNoteBookImage.leftAnchor.constraint(equalTo: nameNotebookLabel.rightAnchor, constant: 16).isActive = true
         defaultNoteBookImage.rightAnchor.constraint(equalTo: safeAreaLayoutGuide.rightAnchor, constant: -16).isActive = true
         defaultNoteBookImage.centerYAnchor.constraint(equalTo: safeAreaLayoutGuide.centerYAnchor).isActive = true
         defaultNoteBookImage.heightAnchor.constraint(equalToConstant: 30).isActive = true

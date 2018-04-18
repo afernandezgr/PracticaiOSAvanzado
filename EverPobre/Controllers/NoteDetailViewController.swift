@@ -13,9 +13,6 @@ import MapKit
 
 class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate,UINavigationControllerDelegate, UITextFieldDelegate, CLLocationManagerDelegate {
 
-    var topImgConstraint = NSLayoutConstraint()
-    var leftImgConstraint = NSLayoutConstraint()
-
     
     var note: Note? {
         didSet {
@@ -77,31 +74,17 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
                     avoidImageTextOverlap(imageView: newImageView)
                 }
             }
-//
-//            if let imageData = company?.imageData {
-//                companyImageView.image = UIImage(data: imageData)
-//                setupCircularImageStyle()
-//            }
-//
-//            guard let founded = company?.founded else { return }
-//
-            
          
         }
     }
     
     var currentDefaultNotebook: Notebook?
     
-    var relativePoint: CGPoint!
-   
-    var map : MKMapView!
-    let locationManager = CLLocationManager()
-
-
     // MARK: - Components UI
 
     var images : [UIImageView] = []
-    
+    var map : MKMapView!
+    let locationManager = CLLocationManager()
    
     let nameNotebookLabel: UILabel = {
         let label = UILabel()
@@ -191,6 +174,9 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
         let map = MKMapView()
         map.translatesAutoresizingMaskIntoConstraints = false
         map.isHidden = true
+        map.mapType = .hybrid
+        map.showsCompass = true
+        map.showsScale = true
         return map
     }()
     
@@ -216,18 +202,11 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
     
     func avoidImageTextOverlap(imageView: UIView)
     {
-       
-        // noteTextView.textContainer.exclusionPaths.removeAll()
-       // for imageView in images {
-
             var rect = noteTextView.convert(imageView.frame, to: noteTextView)
             rect = rect.insetBy(dx: -15, dy: -15)
 
             let path = UIBezierPath(rect: rect)
             noteTextView.textContainer.exclusionPaths=[path]
-
-       // }
-        
     }
     
     private func setupNavigationBar()
@@ -301,7 +280,6 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
         mapView.topAnchor.constraint(equalTo: tagsLabel.bottomAnchor, constant: 2).isActive = true
         mapView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor, constant: 16).isActive = true
         mapView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor, constant: -16).isActive = true
-        mapView.widthAnchor.constraint(equalToConstant: 150).isActive = true
         mapView.heightAnchor.constraint(equalToConstant: 80).isActive = true
         
       
@@ -376,18 +354,17 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
     
     private func createNewNote() {
         
-        let context = CoreDataManager.shared.persistentContainer.viewContext
-        
+        let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
+
         //save general attributes
+        
         if nameNoteTextField.text == "" {
             showError(title: "Name requiered", message: "Please enter note name")
             return
         }
         
-        let newNote = NSEntityDescription.insertNewObject(forEntityName: "Note", into: context) as! Note
+        let newNote = NSEntityDescription.insertNewObject(forEntityName: "Note", into: backMOC) as! Note
 
-        
-        
         
         //validate date
         guard let dateLimitTextField = dateLimitTextField.text else { return }
@@ -402,29 +379,29 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
             }
             newNote.dateLimit = dateLimit
         }
-        newNote.notebook = currentDefaultNotebook
+        newNote.notebook = (backMOC.object(with:(currentDefaultNotebook?.objectID)!)  as! Notebook)
         newNote.notebook?.title = nameNotebookTextField.text
         newNote.title = nameNoteTextField.text
         newNote.content = noteTextView.text
     
         //save location
         if !mapView.isHidden{
-            note?.longitude = mapView.centerCoordinate.longitude
-            note?.latitude = mapView.centerCoordinate.latitude
+            newNote.longitude = mapView.centerCoordinate.longitude
+            newNote.latitude = mapView.centerCoordinate.latitude
         }
         else {
-            note?.longitude = 0
-            note?.latitude = 0
+            newNote.longitude = 0
+            newNote.latitude = 0
         }
         
         //save tags
        
         if let count = note?.tags?.count, count > 0 {
-            deleteAllTags(note: note!)
+            deleteAllTags(note: note!, moc: backMOC)
         }
         var newTag : Tag
         for tag in extractTagsFromText(text: noteTextView.text){
-            newTag = NSEntityDescription.insertNewObject(forEntityName: "Tag", into: context) as! Tag
+            newTag = NSEntityDescription.insertNewObject(forEntityName: "Tag", into: backMOC) as! Tag
             newTag.name = tag
             newTag.note = note
         }
@@ -432,7 +409,7 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
         // save images
         var newImage : ImageNote
         for imageView in images {
-            newImage = NSEntityDescription.insertNewObject(forEntityName: "ImageNote", into: context) as! ImageNote
+            newImage = NSEntityDescription.insertNewObject(forEntityName: "ImageNote", into: backMOC) as! ImageNote
             
             if let imageData = UIImageJPEGRepresentation(imageView.image!, 0.8) {
                 newImage.imageData = imageData
@@ -444,26 +421,27 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
             
         }
         
-//        let backMOC = CoreDataManager.shared.persistentContainer.viewContext
-//        
-//        backMOC.perform {
-//            let backNote = backMOC.object(with:note?.objectID) as! Note
-//            backNote.content = newContent
-//        }
-//        
-        do {
-            try context.save()
-            navigationController?.popViewController(animated: true)
-        } catch let saveErr {
-            print("Fail updating notebook:", saveErr)
+        backMOC.perform {
+       //     _ = backMOC.object(with:(newNote.objectID)) as! Note
+
+            do {
+                try backMOC.save()
+            } catch let saveErr {
+                print("Fail saving notebook:", saveErr)
+            }
         }
-        
-        
+        self.navigationController?.popViewController(animated: true)
     }
     
     private func saveNoteChanges(){
         
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+       // let context = CoreDataManager.sharedManager.persistentContainer.viewContext
+        
+        
+        let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
+
+        
+        let backNote = backMOC.object(with: (note?.objectID)!) as! Note
         
         //save general attributes
         //validate date
@@ -478,42 +456,42 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
                 showError(title: "Bad format date", message: "Date format is not correct (dd/MM/yyyy")
                 return
             }
-            note?.dateLimit = dateLimit
+            backNote.dateLimit = dateLimit
         }
         
-        note?.notebook?.title = nameNotebookTextField.text
-        note?.title = nameNoteTextField.text
-        note?.content = noteTextView.text
+        backNote.notebook?.title = nameNotebookTextField.text
+        backNote.title = nameNoteTextField.text
+        backNote.content = noteTextView.text
         
         //save location
         if !mapView.isHidden{
-            note?.longitude = mapView.centerCoordinate.longitude
-            note?.latitude = mapView.centerCoordinate.latitude
+            backNote.longitude = mapView.centerCoordinate.longitude
+            backNote.latitude = mapView.centerCoordinate.latitude
         }
         else {
-            note?.longitude = 0
-            note?.latitude = 0
+            backNote.longitude = 0
+            backNote.latitude = 0
         }
         
         //save tags
-        if (note?.tags?.count)! > 0{
-            deleteAllTags(note: note!)
+        if (backNote.tags?.count)! > 0{
+            deleteAllTags(note: backNote, moc: backMOC)
         }
         var newTag : Tag
         for tag in extractTagsFromText(text: noteTextView.text){
-            newTag = NSEntityDescription.insertNewObject(forEntityName: "Tag", into: context) as! Tag
+            newTag = NSEntityDescription.insertNewObject(forEntityName: "Tag", into: backMOC) as! Tag
             newTag.name = tag
-            newTag.note = note
+            newTag.note = backNote
         }
 
         //save images
         if (images.count) > 0{
-            deleteAllImages(note: note!)
+            deleteAllImages(note: backNote, moc: backMOC)
         }
         
         var newImage : ImageNote
         for imageView in images {
-            newImage = NSEntityDescription.insertNewObject(forEntityName: "ImageNote", into: context) as! ImageNote
+            newImage = NSEntityDescription.insertNewObject(forEntityName: "ImageNote", into: backMOC) as! ImageNote
             
             if let imageData = UIImageJPEGRepresentation(imageView.image!, 0.8) {
                 newImage.imageData = imageData
@@ -521,50 +499,42 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
             
             newImage.posX = Double(imageView.frame.origin.x)
             newImage.posY = Double(imageView.frame.origin.y)
-            newImage.note = note
+            newImage.note = backNote
         }
         
         
-        do {
-            try context.save()
-            navigationController?.popViewController(animated: true)
-        } catch let saveErr {
-            print("Fail updating notebook:", saveErr)
+        backMOC.performAndWait {
+            do {
+                try backMOC.save()
+                
+            } catch let saveErr {
+                print("Fail updating notebook:", saveErr)
+            }
         }
-    
-    
+        self.navigationController?.popViewController(animated: true)
+        
     }
     
-    private func deleteAllTags(note : Note)
+    private func deleteAllTags(note : Note, moc: NSManagedObjectContext)
     {
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+      // let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         
         if let tags = note.tags{
             for tag in tags {
-                context.delete(tag as! Tag)
+                moc.delete(tag as! Tag)
             }
-//            do {
-//                try context.save()
-//            } catch let saveErr {
-//                print("Fail deleting tags:", saveErr)
-//            }
         }
         
     }
     
-    private func deleteAllImages(note : Note)
+    private func deleteAllImages(note : Note, moc: NSManagedObjectContext)
     {
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+  //      let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         
         if let images = note.images{
             for image in images {
-                context.delete(image as! ImageNote)
+                moc.delete(image as! ImageNote)
             }
-//            do {
-//                try context.save()
-//            } catch let saveErr {
-//                print("Fail deleting images:", saveErr)
-//            }
         }
         
     }

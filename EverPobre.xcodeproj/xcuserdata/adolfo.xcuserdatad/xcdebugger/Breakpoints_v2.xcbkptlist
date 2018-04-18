@@ -70,32 +70,32 @@
       <BreakpointProxy
          BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
          <BreakpointContent
-            shouldBeEnabled = "No"
+            shouldBeEnabled = "Yes"
+            ignoreCount = "0"
+            continueAfterRunningActions = "No"
+            filePath = "EverPobre/Controllers/ModalNoteViewController.swift"
+            timestampString = "545756731.5199341"
+            startingColumnNumber = "9223372036854775807"
+            endingColumnNumber = "9223372036854775807"
+            startingLineNumber = "257"
+            endingLineNumber = "257"
+            landmarkName = "handleSave()"
+            landmarkType = "7">
+         </BreakpointContent>
+      </BreakpointProxy>
+      <BreakpointProxy
+         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
+         <BreakpointContent
+            shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
             filePath = "EverPobre/Controllers/NoteDetailViewController.swift"
-            timestampString = "545674461.49313"
+            timestampString = "545756731.520017"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "23"
-            endingLineNumber = "23"
-            landmarkName = "unknown"
-            landmarkType = "0">
-         </BreakpointContent>
-      </BreakpointProxy>
-      <BreakpointProxy
-         BreakpointExtensionID = "Xcode.Breakpoint.FileBreakpoint">
-         <BreakpointContent
-            shouldBeEnabled = "Yes"
-            ignoreCount = "0"
-            continueAfterRunningActions = "No"
-            filePath = "EverPobre/AppDelegate.swift"
-            timestampString = "545674461.493474"
-            startingColumnNumber = "9223372036854775807"
-            endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "90"
-            endingLineNumber = "90"
-            landmarkName = "primaryViewController(forCollapsing:)"
+            startingLineNumber = "357"
+            endingLineNumber = "357"
+            landmarkName = "createNewNote()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -105,13 +105,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "EverPobre/Controllers/NoteTableViewController.swift"
-            timestampString = "545674461.493536"
+            filePath = "EverPobre/Controllers/NoteDetailViewController.swift"
+            timestampString = "545756731.5203871"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "62"
-            endingLineNumber = "62"
-            landmarkName = "optionsNote()"
+            startingLineNumber = "441"
+            endingLineNumber = "441"
+            landmarkName = "saveNoteChanges()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>
@@ -121,13 +121,13 @@
             shouldBeEnabled = "Yes"
             ignoreCount = "0"
             continueAfterRunningActions = "No"
-            filePath = "EverPobre/AppDelegate.swift"
-            timestampString = "545674461.493588"
+            filePath = "EverPobre/Controllers/NoteDetailViewController.swift"
+            timestampString = "545756731.520628"
             startingColumnNumber = "9223372036854775807"
             endingColumnNumber = "9223372036854775807"
-            startingLineNumber = "94"
-            endingLineNumber = "94"
-            landmarkName = "splitViewController(_:collapseSecondary:onto:)"
+            startingLineNumber = "489"
+            endingLineNumber = "489"
+            landmarkName = "saveNoteChanges()"
             landmarkType = "7">
          </BreakpointContent>
       </BreakpointProxy>

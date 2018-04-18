@@ -60,7 +60,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         
         let navController = UINavigationController(rootViewController: modalNoteViewController)
         //navigationController?.pushViewController(navController, animated: true, completion: nil)
-        splitViewController?.viewControllers.first?.present(navController, animated: true)
+        present(navController, animated: true)
     }
     
     
@@ -177,29 +177,30 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (_, indexPath) in
             let note = self.fetchedResultController.object(at: indexPath) 
-           // self.tableView.deleteRows(at: [indexPath], with: .automatic)
             
-            let context = CoreDataManager.shared.persistentContainer.viewContext
+            let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
            
-            //self.tableView.deleteRows(at: [indexPath], with: .automatic)
-            
-            context.delete(note)
-            
-            do {
-                try context.save()
-            } catch let saveErr {
-                print("Failed to delete note:", saveErr)
+            backMOC.perform {
+                let backNote = backMOC.object(with: note.objectID) as! Note
+                
+                backMOC.delete(backNote)
+                do {
+                    try backMOC.save()
+                } catch let saveErr
+                {
+                    print("Fail deleting note:", saveErr)
+                }
             }
+        
         }
         deleteAction.backgroundColor = UIColor.lightRed
         
-       
         return [deleteAction]
     }
     
     
-    func fetchNotes() { //}-> [Note] {
-        let context = CoreDataManager.shared.persistentContainer.viewContext
+    func fetchNotes() {
+        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         
         let fetchRequest = NSFetchRequest<Note>(entityName: "Note")
         
@@ -227,7 +228,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        fetchNotes()
+       // fetchNotes()
         tableView.reloadData()
     }
     

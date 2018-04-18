@@ -57,13 +57,14 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func applicationDidEnterBackground(_ application: UIApplication) {
         
-        let context = CoreDataManager.shared.persistentContainer.viewContext
-        do {
-            try context.save()
-        } catch let saveErr {
-            print("Fallo salvando note:", saveErr)
+        let privateMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
+        privateMOC.perform {
+            do {
+                try privateMOC.save()
+            } catch let saveErr {
+                print("Saving changes before enter background", saveErr)
+            }
         }
-        
     }
 
     func applicationWillEnterForeground(_ application: UIApplication) {
