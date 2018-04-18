@@ -7,6 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		91581BB92087978700D0FE08 /* NoteDetailViewController+Image Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BB82087978700D0FE08 /* NoteDetailViewController+Image Management.swift */; };
+		91581BBB2087982200D0FE08 /* NoteDetailViewController+Location Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BBA2087982200D0FE08 /* NoteDetailViewController+Location Management.swift */; };
+		91581BBD208799E600D0FE08 /* NoteDetailViewController+UI Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BBC208799E600D0FE08 /* NoteDetailViewController+UI Configuration.swift */; };
+		91581BC120879D3800D0FE08 /* NoteDetailViewController+CoreData operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BC020879D3800D0FE08 /* NoteDetailViewController+CoreData operations.swift */; };
+		91581BC320879E6900D0FE08 /* ModalNoteViewController+CoreData operations.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BC220879E6800D0FE08 /* ModalNoteViewController+CoreData operations.swift */; };
+		91581BC520879ECD00D0FE08 /* ModalNoteViewController+UI Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BC420879ECD00D0FE08 /* ModalNoteViewController+UI Configuration.swift */; };
+		91581BC72087A02D00D0FE08 /* ModalNoteViewController+Picker Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BC62087A02D00D0FE08 /* ModalNoteViewController+Picker Management.swift */; };
+		91581BC92087A0B200D0FE08 /* NoteTableViewController+CoreData Management.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BC82087A0B200D0FE08 /* NoteTableViewController+CoreData Management.swift */; };
+		91581BCB2087A10000D0FE08 /* NoteTableViewController+UI Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91581BCA2087A10000D0FE08 /* NoteTableViewController+UI Configuration.swift */; };
 		9188A1D4207C7E1000ABB265 /* ModalNoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9188A1D3207C7E1000ABB265 /* ModalNoteViewController.swift */; };
 		919CD95C20740591005033F6 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 919CD95B20740591005033F6 /* AppDelegate.swift */; };
 		919CD96120740591005033F6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 919CD95F20740591005033F6 /* Main.storyboard */; };
@@ -25,6 +34,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		91581BB82087978700D0FE08 /* NoteDetailViewController+Image Management.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoteDetailViewController+Image Management.swift"; sourceTree = "<group>"; };
+		91581BBA2087982200D0FE08 /* NoteDetailViewController+Location Management.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoteDetailViewController+Location Management.swift"; sourceTree = "<group>"; };
+		91581BBC208799E600D0FE08 /* NoteDetailViewController+UI Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoteDetailViewController+UI Configuration.swift"; sourceTree = "<group>"; };
+		91581BC020879D3800D0FE08 /* NoteDetailViewController+CoreData operations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoteDetailViewController+CoreData operations.swift"; sourceTree = "<group>"; };
+		91581BC220879E6800D0FE08 /* ModalNoteViewController+CoreData operations.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModalNoteViewController+CoreData operations.swift"; sourceTree = "<group>"; };
+		91581BC420879ECD00D0FE08 /* ModalNoteViewController+UI Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModalNoteViewController+UI Configuration.swift"; sourceTree = "<group>"; };
+		91581BC62087A02D00D0FE08 /* ModalNoteViewController+Picker Management.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "ModalNoteViewController+Picker Management.swift"; sourceTree = "<group>"; };
+		91581BC82087A0B200D0FE08 /* NoteTableViewController+CoreData Management.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoteTableViewController+CoreData Management.swift"; sourceTree = "<group>"; };
+		91581BCA2087A10000D0FE08 /* NoteTableViewController+UI Configuration.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NoteTableViewController+UI Configuration.swift"; sourceTree = "<group>"; };
 		9188A1D3207C7E1000ABB265 /* ModalNoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ModalNoteViewController.swift; sourceTree = "<group>"; };
 		919CD95820740591005033F6 /* EverPobre.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = EverPobre.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		919CD95B20740591005033F6 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -120,8 +138,17 @@
 			isa = PBXGroup;
 			children = (
 				919CD97E20755809005033F6 /* NoteTableViewController.swift */,
+				91581BCA2087A10000D0FE08 /* NoteTableViewController+UI Configuration.swift */,
+				91581BC82087A0B200D0FE08 /* NoteTableViewController+CoreData Management.swift */,
 				91FCA7862077E54D000B0CFF /* NoteDetailViewController.swift */,
+				91581BB82087978700D0FE08 /* NoteDetailViewController+Image Management.swift */,
+				91581BBA2087982200D0FE08 /* NoteDetailViewController+Location Management.swift */,
+				91581BBC208799E600D0FE08 /* NoteDetailViewController+UI Configuration.swift */,
+				91581BC020879D3800D0FE08 /* NoteDetailViewController+CoreData operations.swift */,
 				9188A1D3207C7E1000ABB265 /* ModalNoteViewController.swift */,
+				91581BC220879E6800D0FE08 /* ModalNoteViewController+CoreData operations.swift */,
+				91581BC420879ECD00D0FE08 /* ModalNoteViewController+UI Configuration.swift */,
+				91581BC62087A02D00D0FE08 /* ModalNoteViewController+Picker Management.swift */,
 			);
 			path = Controllers;
 			sourceTree = "<group>";
@@ -206,17 +233,26 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				91581BC520879ECD00D0FE08 /* ModalNoteViewController+UI Configuration.swift in Sources */,
+				91581BC320879E6900D0FE08 /* ModalNoteViewController+CoreData operations.swift in Sources */,
+				91581BC72087A02D00D0FE08 /* ModalNoteViewController+Picker Management.swift in Sources */,
 				919CD97F20755809005033F6 /* NoteTableViewController.swift in Sources */,
 				919CD97D2074173E005033F6 /* NotebookCell.swift in Sources */,
+				91581BC92087A0B200D0FE08 /* NoteTableViewController+CoreData Management.swift in Sources */,
 				9188A1D4207C7E1000ABB265 /* ModalNoteViewController.swift in Sources */,
+				91581BCB2087A10000D0FE08 /* NoteTableViewController+UI Configuration.swift in Sources */,
 				919CD97820740F43005033F6 /* UIColors.swift in Sources */,
 				919CD97A20741057005033F6 /* UIViewController+Additions.swift in Sources */,
 				919CD97220740835005033F6 /* EverPobre.xcdatamodeld in Sources */,
 				91D5BAF82078C03C00D65BD8 /* UINavigationController+Additions.swift in Sources */,
 				919CD981207558A5005033F6 /* NoteCell.swift in Sources */,
+				91581BBB2087982200D0FE08 /* NoteDetailViewController+Location Management.swift in Sources */,
 				919CD9742074085E005033F6 /* CoreDataManager.swift in Sources */,
+				91581BC120879D3800D0FE08 /* NoteDetailViewController+CoreData operations.swift in Sources */,
 				91FCA7872077E54D000B0CFF /* NoteDetailViewController.swift in Sources */,
+				91581BBD208799E600D0FE08 /* NoteDetailViewController+UI Configuration.swift in Sources */,
 				919CD95C20740591005033F6 /* AppDelegate.swift in Sources */,
+				91581BB92087978700D0FE08 /* NoteDetailViewController+Image Management.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

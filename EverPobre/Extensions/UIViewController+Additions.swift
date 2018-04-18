@@ -15,7 +15,7 @@ extension UIViewController {
         return UINavigationController(rootViewController: self)
     }
     
-    private func showError(title: String, message: String) {
+    func showError(title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
         present(alertController, animated: true, completion: nil)

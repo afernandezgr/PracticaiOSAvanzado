@@ -41,60 +41,9 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     }
 
     
-    private func setupUI(){
-        tableView.backgroundColor = .tealColor
-        tableView.tableFooterView = UIView()
-        tableView.separatorColor = .white
-        navigationItem.title = "Notebooks"
-    
-        
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "tools"),  style: UIBarButtonItemStyle.plain, target: self, action: #selector(optionsNote))
-
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "plus"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleNewNote))
-    }
-    
-    
-    @objc private func optionsNote(){
-        let modalNoteViewController = ModalNoteViewController()
-        modalNoteViewController.currentDefaultNotebook = currentDefaultNotebook
-        
-        let navController = UINavigationController(rootViewController: modalNoteViewController)
-        //navigationController?.pushViewController(navController, animated: true, completion: nil)
-        present(navController, animated: true)
-    }
-    
-    
-    @objc private func handleNewNote() {
    
-        if let currentDefaultNotebook = currentDefaultNotebook {
-            
-            let noteViewController = NoteDetailViewController()
-            noteViewController.currentDefaultNotebook = currentDefaultNotebook
-            //navigationController?.pushViewController(noteViewController, animated: true)
-            
-            if UIDevice.current.userInterfaceIdiom == .pad {
-                splitViewController?.showDetailViewController(noteViewController.wrappedInNavigation(), sender: nil)
-            }
-            else
-            {
-                navigationController?.pushViewController(noteViewController, animated: true)
-            }
-        } else {
-            showError(title: "Not default notebook selected", message: "You need a default notebook to be selected")
-        }
-        
-    }
-    
-    private func showError(title: String, message: String) {
-        let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
-        present(alertController, animated: true, completion: nil)
-    }
-
-    
     // MARK: - TableView funcs
 
-    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let noteViewController = NoteDetailViewController()
         noteViewController.note = fetchedResultController.object(at: indexPath)
@@ -117,8 +66,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         
     }
     
-    
-    
+   
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cellId", for: indexPath) as! NoteCell
         let note = fetchedResultController.object(at: indexPath)
@@ -172,7 +120,6 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         return 60
     }
     
-    
     override func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath) -> [UITableViewRowAction]? {
         
         let deleteAction = UITableViewRowAction(style: .destructive, title: "Delete") { (_, indexPath) in
@@ -198,39 +145,6 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         return [deleteAction]
     }
     
-    
-    func fetchNotes() {
-        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
-        
-        let fetchRequest = NSFetchRequest<Note>(entityName: "Note")
-        
-        
-        let sortByDefaultFirst = NSSortDescriptor(key: "notebook.defaultNotebook", ascending: false)
-        
-        let sortByTitle = NSSortDescriptor(key: "notebook.title", ascending: true)
-        
-        fetchRequest.sortDescriptors = [sortByDefaultFirst, sortByTitle]
-        
-        fetchedResultController =
-            NSFetchedResultsController(fetchRequest: fetchRequest,
-                                       managedObjectContext: context,
-                                       sectionNameKeyPath: "notebook.title",
-                                       cacheName: nil)
-       
-        fetchRequest.fetchBatchSize = 25
-        do {
-            try fetchedResultController.performFetch()  //context.fetch(fetchRequest)
-             fetchedResultController.delegate = self
-        } catch let fetchErr {
-            print("Fallo recuperado notes:", fetchErr)
-            //return []
-        }
-    }
-    
-    func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-       // fetchNotes()
-        tableView.reloadData()
-    }
     
    
    
