@@ -2,7 +2,7 @@
 
 
 
-## Ever Pobre
+## EverPobre
 
 
 **Objetivo**
@@ -14,13 +14,15 @@ Navegación General:
 
 - Hace uso de un splitViewController, la App es universal (iPad / iPhone)
 
-- El master es el listado de notas, organizadas en secciones según su notebook. El orden será primero el notebook donde se creen las notas de forma rápida y el resto alfabéticamente según titulo.
+- El master es el listado de notas, organizadas en secciones según su notebook. El orden será primero el notebook donde se creen las notas de forma rápida (default notebook) y el resto alfabéticamente según titulo.
 
 - El detalle, es la vista de nota con todos sus detalles.
 
 - Existe una viewController modal, se mostrará en el master, para crear nuevo notebook, borrarlos o seleccionar el por defecto.
 
-- La app creará una nota en la notebook seleccionada por defecto, es requisito para crear un nueva nota el tener seleccionada una notabook por defecto. La notebook seleccionada por defecto aparece marcada con una estrella.
+- La app creará una nota en la notebook seleccionada por defecto si se pulsa el botón que indica +FAST, o bien si se pulsa el botón +NOTE permitirá seleccionar el notebook donde se quiere crear el note
+
+- La notebook seleccionada por defecto aparece marcada con una estrella.
 
 -Se hace uso de custom cells
 

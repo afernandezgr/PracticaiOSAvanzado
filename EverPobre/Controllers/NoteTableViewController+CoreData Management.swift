@@ -33,8 +33,8 @@ extension NoteTableViewController{
             try fetchedResultController.performFetch()  
             fetchedResultController.delegate = self
         } catch let fetchErr {
-            print("Fallo recuperado notes:", fetchErr)
-            //return []
+            print("Fail restoring notes:", fetchErr)
+            
         }
     }
     
@@ -50,16 +50,15 @@ extension NoteTableViewController{
         
         let sortByDefaultFirst = NSSortDescriptor(key: "defaultNotebook", ascending: false)
         let sortByTitle = NSSortDescriptor(key: "title", ascending: true)
-        fetchRequest.sortDescriptors = [sortByDefaultFirst, sortByTitle]
-        
+        fetchRequest.sortDescriptors = [sortByDefaultFirst, sortByTitle]        
         fetchRequest.fetchBatchSize = 50
         
         var notebooks: [Notebook] = []
         
         do {
             try notebooks = context.fetch(fetchRequest)
-        } catch {
-            print(error)
+        } catch let fetchErr {
+            print("Fail restoring notebooks:", fetchErr)
         }
         
         return notebooks
