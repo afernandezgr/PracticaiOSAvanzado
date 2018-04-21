@@ -43,7 +43,7 @@ extension NoteDetailViewController {
         actionSheetAlert.addAction(usePhotoLibrary)
         actionSheetAlert.addAction(cancel)
         
-        if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad ){
+        if ( UIDevice.current.userInterfaceIdiom == .pad ){
             
             if let currentPopoverpresentioncontroller = actionSheetAlert.popoverPresentationController{
                 currentPopoverpresentioncontroller.barButtonItem = sender
@@ -87,29 +87,24 @@ extension NoteDetailViewController {
     @objc func handlePan(recognizer: UIPanGestureRecognizer) {
         switch recognizer.state {
         case .began:
+            closeKeyboard()
             break
         case .changed:
             let translation = recognizer.translation(in: recognizer.view)
             recognizer.view?.center = CGPoint(x: (recognizer.view?.center.x)! + translation.x, y: (recognizer.view?.center.y)! + translation.y)
             recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
         case .ended:
-            avoidImageTextOverlap(imageView: recognizer.view!)
+            avoidImageTextOverlap()
         default:
             break
         }
-            
-//        if recognizer.state == .began || recognizer.state == .changed {
-//            let translation = recognizer.translation(in: recognizer.view)
-//            recognizer.view?.center = CGPoint(x: (recognizer.view?.center.x)! + translation.x, y: (recognizer.view?.center.y)! + translation.y)
-//            recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
-//            avoidImageTextOverlap(imageView: recognizer.view!)
-//        }
     }
     
     // handle UIPinchGestureRecognizer
     @objc func handlePinch(recognizer: UIPinchGestureRecognizer) {
         switch recognizer.state {
         case .began:
+            closeKeyboard()
             break
         case .changed:
             let currentScale:CGFloat = 1
@@ -124,7 +119,7 @@ extension NoteDetailViewController {
             recognizer.scale = 1.0
             break
         case .ended,.cancelled:
-            avoidImageTextOverlap(imageView: recognizer.view!)
+            avoidImageTextOverlap()
             break
         default:
             break
@@ -135,11 +130,12 @@ extension NoteDetailViewController {
     @objc func handleRotate(recognizer: UIRotationGestureRecognizer) {
         switch recognizer.state {
         case .began, .changed:
+            closeKeyboard()
             recognizer.view?.transform = (recognizer.view?.transform.rotated(by: recognizer.rotation))!
             recognizer.rotation = 0.0
             break
         case .ended,.cancelled:
-            avoidImageTextOverlap(imageView: recognizer.view!)
+            avoidImageTextOverlap()
             break
         default:
             break
@@ -147,16 +143,13 @@ extension NoteDetailViewController {
     }
         
         
-    func avoidImageTextOverlap(imageView: UIView)
-    {
+    func avoidImageTextOverlap(){
         var paths = [UIBezierPath]()
         
         for image in images {
             var rect = noteTextView.convert(image.frame, to: noteTextView)
             rect = rect.insetBy(dx: -15, dy: -15)
             paths.append(UIBezierPath(rect: rect))
-//            let path = UIBezierPath(rect: rect)
-//            noteTextView.textContainer.exclusionPaths=[path]
         }
         noteTextView.textContainer.exclusionPaths=paths
     }

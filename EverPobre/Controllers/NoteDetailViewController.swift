@@ -74,11 +74,9 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
                     let rotateViewGesture = UIRotationGestureRecognizer(target: self, action: #selector(handleRotate))
                     newImageView.addGestureRecognizer(rotateViewGesture)
 
-                    
-                    
                     images.append(newImageView)
-                    avoidImageTextOverlap(imageView: newImageView)
                 }
+                avoidImageTextOverlap()
             }
          
         }

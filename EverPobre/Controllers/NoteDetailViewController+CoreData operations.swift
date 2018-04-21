@@ -81,7 +81,7 @@ extension NoteDetailViewController {
             newImage.width = Double(imageView.frame.width)
             newImage.height = Double(imageView.frame.height)
            
-            let angle : CGFloat = CGFloat(atan2f(Float(imageView.transform.b), Float(imageView.transform.b)))
+            let angle : CGFloat = CGFloat(atan2f(Float(imageView.transform.b), Float(imageView.transform.a)))
             newImage.rotation = Double(angle)
             
             newImage.note = note
@@ -170,10 +170,10 @@ extension NoteDetailViewController {
             newImage.width = Double(imageView.frame.width)
             newImage.height = Double(imageView.frame.height)
             
-            let angle : CGFloat = CGFloat(atan2f(Float(imageView.transform.b), Float(imageView.transform.b)))
+            let angle : CGFloat = CGFloat(atan2f(Float(imageView.transform.b), Float(imageView.transform.a)))
             newImage.rotation = Double(angle)
             newImage.note = backNote
-            //TO DO: Scale management and rotation
+           
            
         }
         

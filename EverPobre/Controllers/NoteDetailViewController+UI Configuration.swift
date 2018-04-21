@@ -97,6 +97,10 @@ extension NoteDetailViewController {
         noteTextView.leftAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leftAnchor).isActive = true
         noteTextView.rightAnchor.constraint(equalTo: view.safeAreaLayoutGuide.rightAnchor).isActive = true
         
+        let swipeGesture = UISwipeGestureRecognizer(target: self, action: #selector(closeKeyboard))
+        swipeGesture.direction = .down
+        view.addGestureRecognizer(swipeGesture)
+        
     }
     
     @objc func closeKeyboard()

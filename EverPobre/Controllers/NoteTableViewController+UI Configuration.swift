@@ -29,7 +29,13 @@ extension NoteTableViewController {
         modalNoteViewController.currentDefaultNotebook = currentDefaultNotebook
         
         let navController = UINavigationController(rootViewController: modalNoteViewController)
-        self.present(navController, animated: true)
+        navController.modalPresentationStyle = .currentContext
+        if UIDevice.current.userInterfaceIdiom == .pad {
+            splitViewController?.viewControllers.first?.present(navController, animated: true, completion: nil)
+        }
+        else {
+            self.present(navController, animated: true)
+        }
     }
     
     
