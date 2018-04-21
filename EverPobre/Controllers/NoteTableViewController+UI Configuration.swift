@@ -21,7 +21,7 @@ extension NoteTableViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "tools"),  style: UIBarButtonItemStyle.plain, target: self, action: #selector(optionsNote))
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "plus"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleNewNote))
+        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "plusnote"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleNewNote))
     }
     
     @objc private func optionsNote(){
@@ -29,8 +29,7 @@ extension NoteTableViewController {
         modalNoteViewController.currentDefaultNotebook = currentDefaultNotebook
         
         let navController = UINavigationController(rootViewController: modalNoteViewController)
-        //navigationController?.pushViewController(navController, animated: true, completion: nil)
-        present(navController, animated: true)
+        self.present(navController, animated: true)
     }
     
     
@@ -40,8 +39,7 @@ extension NoteTableViewController {
             
             let noteViewController = NoteDetailViewController()
             noteViewController.currentDefaultNotebook = currentDefaultNotebook
-            //navigationController?.pushViewController(noteViewController, animated: true)
-            
+             
             if UIDevice.current.userInterfaceIdiom == .pad {
                 splitViewController?.showDetailViewController(noteViewController.wrappedInNavigation(), sender: nil)
             }

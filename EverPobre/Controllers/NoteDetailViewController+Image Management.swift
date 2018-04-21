@@ -21,7 +21,7 @@ extension NoteDetailViewController {
     }
     
     
-    @objc func catchPhoto()
+    @objc func catchPhoto(sender: UIBarButtonItem)
     {
         let actionSheetAlert = UIAlertController(title: NSLocalizedString("Add photo", comment: "Add photo"), message: nil, preferredStyle: .actionSheet)
         
@@ -43,7 +43,17 @@ extension NoteDetailViewController {
         actionSheetAlert.addAction(usePhotoLibrary)
         actionSheetAlert.addAction(cancel)
         
-        present(actionSheetAlert, animated: true, completion: nil)
+        if ( UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad ){
+            
+            if let currentPopoverpresentioncontroller = actionSheetAlert.popoverPresentationController{
+                currentPopoverpresentioncontroller.barButtonItem = sender
+                currentPopoverpresentioncontroller.permittedArrowDirections = UIPopoverArrowDirection.down;
+                self.present(actionSheetAlert, animated: true, completion: nil)
+            }
+        }else{
+            self.present(actionSheetAlert, animated: true, completion: nil)
+        }
+        
     }
     
     func addImageToNote(image: UIImage){
@@ -72,87 +82,82 @@ extension NoteDetailViewController {
         images.append(newImageView)
     }
     
-    //    @objc func handlePan(longPressGesture:UIPanGestureRecognizer)
-    //    {
-    //
-    //        switch longPressGesture.state {
-    //        case .began:
-    //            closeKeyboard()
-    //            relativePoint = longPressGesture.location(in: longPressGesture.view)
-    //            UIView.animate(withDuration: 0.1, animations: {
-    //                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1.2, y: 1.2)
-    //            })
-    //
-    //        case .changed:
-    //            let location = longPressGesture.location(in: noteTextView)
-    //
-    ////            longPressGesture.view?.constraints[
-    //            leftImgConstraint.constant = location.x - relativePoint.x
-    //            topImgConstraint.constant = location.y - relativePoint.y
-    //
-    //        case .ended, .cancelled:
-    //
-    //            UIView.animate(withDuration: 0.1, animations: {
-    //                longPressGesture.view?.transform = CGAffineTransform.init(scaleX: 1, y: 1)
-    //            })
-    //
-    //        default:
-    //            break
-    //        }
-    //    }
-    
-    
+
     
     @objc func handlePan(recognizer: UIPanGestureRecognizer) {
-        //let gview = recognizer.view
-        if recognizer.state == .began || recognizer.state == .changed {
+        switch recognizer.state {
+        case .began:
+            break
+        case .changed:
             let translation = recognizer.translation(in: recognizer.view)
-            
-            //let translation = recognizer.translation(in: noteTextView)
             recognizer.view?.center = CGPoint(x: (recognizer.view?.center.x)! + translation.x, y: (recognizer.view?.center.y)! + translation.y)
             recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
-            //viewDidLayoutSubviews()
+        case .ended:
             avoidImageTextOverlap(imageView: recognizer.view!)
+        default:
+            break
         }
+            
+//        if recognizer.state == .began || recognizer.state == .changed {
+//            let translation = recognizer.translation(in: recognizer.view)
+//            recognizer.view?.center = CGPoint(x: (recognizer.view?.center.x)! + translation.x, y: (recognizer.view?.center.y)! + translation.y)
+//            recognizer.setTranslation(CGPoint.zero, in: recognizer.view)
+//            avoidImageTextOverlap(imageView: recognizer.view!)
+//        }
     }
     
     // handle UIPinchGestureRecognizer
     @objc func handlePinch(recognizer: UIPinchGestureRecognizer) {
-        if recognizer.state == .changed || recognizer.state == .ended {
-            //            var currentScale:CGFloat = 1
-            //
-            //            var newScale:CGFloat = currentScale * recognizer.scale;
-            //            if (newScale < 0.7) {
-            //                newScale = 0.7;
-            //            }
-            //            if (newScale > 1.5) {
-            //                newScale = 1.5;
-            //            }
-            //
-            
-            if (recognizer.scale >= 0.7 && recognizer.scale<=1.3){
-                recognizer.view?.transform = (recognizer.view?.transform.scaledBy(x: recognizer.scale, y: recognizer.scale))!
+        switch recognizer.state {
+        case .began:
+            break
+        case .changed:
+            let currentScale:CGFloat = 1
+            var newScale:CGFloat = currentScale * recognizer.scale;
+            if (newScale < 0.7) {
+                newScale = 0.7;
             }
+            if (newScale > 1.5) {
+                newScale = 1.5;
+            }
+            recognizer.view?.transform = (recognizer.view?.transform.scaledBy(x: newScale, y: newScale))!
             recognizer.scale = 1.0
+            break
+        case .ended,.cancelled:
+            avoidImageTextOverlap(imageView: recognizer.view!)
+            break
+        default:
+            break
         }
     }
     
     // handle UIRotationGestureRecognizer
     @objc func handleRotate(recognizer: UIRotationGestureRecognizer) {
-        if recognizer.state == .began || recognizer.state == .changed {
-            
+        switch recognizer.state {
+        case .began, .changed:
             recognizer.view?.transform = (recognizer.view?.transform.rotated(by: recognizer.rotation))!
             recognizer.rotation = 0.0
-            
+            break
+        case .ended,.cancelled:
+            avoidImageTextOverlap(imageView: recognizer.view!)
+            break
+        default:
+            break
         }
     }
-    
+        
+        
     func avoidImageTextOverlap(imageView: UIView)
     {
-        var rect = noteTextView.convert(imageView.frame, to: noteTextView)
-        rect = rect.insetBy(dx: -15, dy: -15)
+        var paths = [UIBezierPath]()
         
-        let path = UIBezierPath(rect: rect)
-        noteTextView.textContainer.exclusionPaths=[path]
+        for image in images {
+            var rect = noteTextView.convert(image.frame, to: noteTextView)
+            rect = rect.insetBy(dx: -15, dy: -15)
+            paths.append(UIBezierPath(rect: rect))
+//            let path = UIBezierPath(rect: rect)
+//            noteTextView.textContainer.exclusionPaths=[path]
+        }
+        noteTextView.textContainer.exclusionPaths=paths
     }
 }

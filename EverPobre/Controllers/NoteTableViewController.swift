@@ -31,7 +31,8 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         tableView.register(NoteCell.self, forCellReuseIdentifier: "cellId")
         tableView.register(NotebookCell.self, forHeaderFooterViewReuseIdentifier: "CustomHeader")
         setupUI()
-       
+        
+        forceDisplayFirstNoteiPad()
     }
     
     
@@ -48,11 +49,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
         let noteViewController = NoteDetailViewController()
         noteViewController.note = fetchedResultController.object(at: indexPath)
         noteViewController.currentDefaultNotebook = currentDefaultNotebook
-        
-//        if splitViewController!.isCollapsed {
-//            navigationController?.pushViewController(noteViewController, animated: true)
-//        }
-//
+    
         
         if UIDevice.current.userInterfaceIdiom == .pad {
             splitViewController?.showDetailViewController(noteViewController.wrappedInNavigation(), sender: nil)
@@ -146,8 +143,13 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     }
     
     
-   
-   
+    private func forceDisplayFirstNoteiPad(){
+        if ( fetchedResultController.sections!.count>0 && UI_USER_INTERFACE_IDIOM() == UIUserInterfaceIdiom.pad ){
+            let indexPath = IndexPath(row: 0, section: 0);
+            self.tableView.selectRow(at: indexPath, animated: false, scrollPosition: UITableViewScrollPosition.none)
+            self.tableView(self.tableView, didSelectRowAt: indexPath)
+        }
+    }
 
 }
 

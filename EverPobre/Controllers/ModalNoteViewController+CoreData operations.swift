@@ -97,13 +97,19 @@ extension ModalNoteViewController {
         
         //let context = CoreDataManager.sharedManager.persistentContainer.viewContext
         if tabBarCnt.selectedIndex ==  0 {  //new notebook creation
-            
+            //verify notebook name empty
             if (nameNotebookTextField.text?.isEmpty)! {
                 showError(title: "Empty notebook name", message: "You have not entered notebook name.")
                 return
             }
             let noteName = self.nameNotebookTextField.text
             
+            //verify notebook already used
+            if ((fetchedResultControllerDefault.fetchedObjects as! [Notebook]).filter { $0.title == noteName }).count > 0 {
+                showError(title: "Wrong name", message: "Notebook name already used. Please choose another name")
+                return
+            }
+
             let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
             backMOC.performAndWait {
                 let notebook = NSEntityDescription.insertNewObject(forEntityName: "Notebook", into: backMOC)  as! Notebook
@@ -155,15 +161,21 @@ extension ModalNoteViewController {
             dismiss(animated: true, completion: nil)
         }
         else if tabBarCnt.selectedIndex == 2 { //setdefault
-            if let currentNotebook = currentDefaultNotebook {
-                currentNotebook.defaultNotebook = false
-            }
-            
+//            if let currentNotebook = currentDefaultNotebook {
+//                currentNotebook.defaultNotebook = false
+//            }
+//
             let indexPath = IndexPath(row: notebookDefaultPicker.selectedRow(inComponent: 0),  section: 0)
             let newDefaultNotebook  = self.fetchedResultControllerDefault.object(at: indexPath as IndexPath) as Notebook
             
             let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
             backMOC.performAndWait {
+              
+                if let currentNotebook = currentDefaultNotebook {
+                    currentNotebook.defaultNotebook = false
+                    let backCurrentDefaulNotebook = backMOC.object(with: currentNotebook.objectID) as! Notebook
+                    backCurrentDefaulNotebook.defaultNotebook = false
+                }
                 let backNewDefaulNotebook = backMOC.object(with: newDefaultNotebook.objectID) as! Notebook
                 backNewDefaulNotebook.defaultNotebook = true
                 do {

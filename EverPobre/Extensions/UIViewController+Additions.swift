@@ -17,7 +17,9 @@ extension UIViewController {
     
     func showError(title: String, message: String) {
         let alertController = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        alertController.modalPresentationStyle = .popover
         alertController.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+        
         present(alertController, animated: true, completion: nil)
     }
 }

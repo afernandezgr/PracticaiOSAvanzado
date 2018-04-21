@@ -69,10 +69,8 @@ extension ModalNoteViewController {
         nameNotebookToDeleteAskLabel.heightAnchor.constraint(equalToConstant: 70).isActive = true
         
         deleteNotebookVC.view.addSubview(notebookSwitchTransfer)
-        notebookSwitchTransfer.topAnchor.constraint(equalTo: notebookToDeletePicker.bottomAnchor,constant: 4).isActive = true
+        notebookSwitchTransfer.topAnchor.constraint(equalTo: notebookToDeletePicker.bottomAnchor,constant: 12).isActive = true
         notebookSwitchTransfer.leftAnchor.constraint(equalTo: nameNotebookToDeleteAskLabel.rightAnchor, constant: 8).isActive = true
-        //      notebookSwitchTransfer.rightAnchor.constraint(equalTo: deleteNotebookVC.view.rightAnchor, constant: -16).isActive = true
-        //        notebookSwitchTransfer.widthAnchor.constraint(equalToConstant: 50).isActive = true
         notebookSwitchTransfer.centerYAnchor.constraint(equalTo: nameNotebookToDeleteAskLabel.centerYAnchor).isActive = true
         
         deleteNotebookVC.view.addSubview(notebookToTransferPicker)

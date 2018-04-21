@@ -54,12 +54,16 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
                     newImageView.contentMode = .scaleAspectFill
                     newImageView.translatesAutoresizingMaskIntoConstraints = false
                     newImageView.isUserInteractionEnabled = true
+                    //recover tag of the TextView to add images inside
                     
                     view.viewWithTag(1010)?.addSubview(newImageView)
                     newImageView.topAnchor.constraint(equalTo: noteTextView.topAnchor, constant: CGFloat(image.posY)).isActive = true
                     newImageView.leftAnchor.constraint(equalTo: noteTextView.leftAnchor, constant: CGFloat(image.posX)).isActive = true
-                    newImageView.widthAnchor.constraint(equalToConstant: 150).isActive = true
-                    newImageView.heightAnchor.constraint(equalToConstant: 100).isActive = true
+                    newImageView.widthAnchor.constraint(equalToConstant: CGFloat(image.width)).isActive = true
+                    newImageView.heightAnchor.constraint(equalToConstant: CGFloat(image.height)).isActive = true
+                    
+                    let transform : CGAffineTransform  = CGAffineTransform(rotationAngle: CGFloat(image.rotation))
+                    newImageView.transform = transform
                     
                     let moveViewGesture = UIPanGestureRecognizer(target: self, action: #selector(handlePan))
                     newImageView.addGestureRecognizer(moveViewGesture)
@@ -70,7 +74,9 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
                     let rotateViewGesture = UIRotationGestureRecognizer(target: self, action: #selector(handleRotate))
                     newImageView.addGestureRecognizer(rotateViewGesture)
 
-                   images.append(newImageView)
+                    
+                    
+                    images.append(newImageView)
                     avoidImageTextOverlap(imageView: newImageView)
                 }
             }

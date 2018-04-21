@@ -37,15 +37,12 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     
         let splitViewController = UISplitViewController()
         splitViewController.delegate = self
+        splitViewController.preferredDisplayMode = .allVisible
         splitViewController.viewControllers = [noteListViewController?.wrappedInNavigation(), detailNoteViewController?.wrappedInNavigation()] as! [UIViewController]
       
         // Asignamos el rootVC
         window?.rootViewController = splitViewController
         
-        
-//        let viewController = NoteTableViewController()
-//        window?.rootViewController = viewController.wrappedInNavigation()
-     
         
         return true
     }
