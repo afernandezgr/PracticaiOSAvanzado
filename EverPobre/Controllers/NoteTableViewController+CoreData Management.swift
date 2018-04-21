@@ -30,7 +30,7 @@ extension NoteTableViewController{
         
         fetchRequest.fetchBatchSize = 25
         do {
-            try fetchedResultController.performFetch()  //context.fetch(fetchRequest)
+            try fetchedResultController.performFetch()  
             fetchedResultController.delegate = self
         } catch let fetchErr {
             print("Fallo recuperado notes:", fetchErr)
@@ -39,9 +39,30 @@ extension NoteTableViewController{
     }
     
     func controllerDidChangeContent(_ controller: NSFetchedResultsController<NSFetchRequestResult>) {
-        // fetchNotes()
         tableView.reloadData()
     }
     
+    func getNotebooks() -> [Notebook] {
+        let context = CoreDataManager.sharedManager.persistentContainer.viewContext
+        
+        let fetchRequest: NSFetchRequest<Notebook> = Notebook.fetchRequest()
+        fetchRequest.entity = NSEntityDescription.entity(forEntityName: "Notebook", in: context)
+        
+        let sortByDefaultFirst = NSSortDescriptor(key: "defaultNotebook", ascending: false)
+        let sortByTitle = NSSortDescriptor(key: "title", ascending: true)
+        fetchRequest.sortDescriptors = [sortByDefaultFirst, sortByTitle]
+        
+        fetchRequest.fetchBatchSize = 50
+        
+        var notebooks: [Notebook] = []
+        
+        do {
+            try notebooks = context.fetch(fetchRequest)
+        } catch {
+            print(error)
+        }
+        
+        return notebooks
+    }
     
 }

@@ -48,7 +48,7 @@ class NoteTableViewController: UITableViewController, NSFetchedResultsController
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let noteViewController = NoteDetailViewController()
         noteViewController.note = fetchedResultController.object(at: indexPath)
-        noteViewController.currentDefaultNotebook = currentDefaultNotebook
+        noteViewController.currentNotebook = currentDefaultNotebook
     
         
         if UIDevice.current.userInterfaceIdiom == .pad {

@@ -21,7 +21,11 @@ extension NoteTableViewController {
         
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "tools"),  style: UIBarButtonItemStyle.plain, target: self, action: #selector(optionsNote))
         
-        navigationItem.leftBarButtonItem = UIBarButtonItem(image: #imageLiteral(resourceName: "plusnote"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleNewNote))
+        let addNewNoteButton  = UIBarButtonItem(image: #imageLiteral(resourceName: "fast"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(handleNewNote))
+        
+        let selectNotebookButton  = UIBarButtonItem(image: #imageLiteral(resourceName: "plusnote"), style: UIBarButtonItemStyle.plain, target: self, action: #selector(selectNotebook))
+        
+        navigationItem.leftBarButtonItems = [addNewNoteButton, selectNotebookButton]
     }
     
     @objc private func optionsNote(){
@@ -38,13 +42,56 @@ extension NoteTableViewController {
         }
     }
     
+    @objc private func selectNotebook(sender: UIBarButtonItem) {
+        let notebooks = getNotebooks()
+        
+        let selectNotebook = UIAlertController(title: "Select Notebook", message: "Please select notebook to create note", preferredStyle: .actionSheet)
+        
+         let noteViewController = NoteDetailViewController()
+        
+        notebooks.forEach({ (notebook) in
+            selectNotebook.addAction(UIAlertAction(title: notebook.title, style: .default, handler: {
+                (action: UIAlertAction) -> Void in
+                noteViewController.currentNotebook = notebook
+                if UIDevice.current.userInterfaceIdiom == .pad {
+                    self.splitViewController?.showDetailViewController(noteViewController.wrappedInNavigation(), sender: nil)
+                }
+                else
+                {
+                    self.navigationController?.pushViewController(noteViewController, animated: true)
+                }
+            }))
+        })
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        selectNotebook.addAction(cancelAction)
+        
+        //selectNotebook.prepareForIPAD(source: self.view, bartButtonItem: self.toolbarItems?.first, direction: .down)
+        
+        
+        
+        if ( UIDevice.current.userInterfaceIdiom == .pad ){
+            
+            if let currentPopoverpresentioncontroller = selectNotebook.popoverPresentationController{
+                currentPopoverpresentioncontroller.barButtonItem = sender
+                currentPopoverpresentioncontroller.permittedArrowDirections = UIPopoverArrowDirection.down;
+                self.present(selectNotebook, animated: true, completion: nil)
+            }
+        }else{
+            self.present(selectNotebook, animated: true, completion: nil)
+        }
+        
+    }
+    
+    
+   
     
     @objc private func handleNewNote() {
         
         if let currentDefaultNotebook = currentDefaultNotebook {
             
             let noteViewController = NoteDetailViewController()
-            noteViewController.currentDefaultNotebook = currentDefaultNotebook
+            noteViewController.currentNotebook = currentDefaultNotebook
              
             if UIDevice.current.userInterfaceIdiom == .pad {
                 splitViewController?.showDetailViewController(noteViewController.wrappedInNavigation(), sender: nil)

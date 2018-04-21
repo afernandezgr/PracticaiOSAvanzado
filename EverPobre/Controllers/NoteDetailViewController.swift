@@ -82,7 +82,7 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
         }
     }
     
-    var currentDefaultNotebook: Notebook?
+    var currentNotebook: Notebook?
     
     // MARK: - Proporties Components UI
 
@@ -190,7 +190,7 @@ class NoteDetailViewController: UIViewController,UIImagePickerControllerDelegate
         super.viewDidLoad()
         
         if note == nil {
-            nameNotebookTextField.text = currentDefaultNotebook?.title
+            nameNotebookTextField.text = currentNotebook?.title
         }
         
         self.locationManager.delegate = self

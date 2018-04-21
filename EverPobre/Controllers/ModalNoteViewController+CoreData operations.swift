@@ -34,7 +34,6 @@ extension ModalNoteViewController {
         
         do {
             try fetchedResultControllerDefault.performFetch()
-            print(fetchedResultControllerDefault)
         } catch let fetchErr {
             print("Failing recovering notebooks:", fetchErr)
             

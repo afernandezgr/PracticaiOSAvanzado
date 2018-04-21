@@ -40,7 +40,7 @@ extension NoteDetailViewController {
             }
             newNote.dateLimit = dateLimit
         }
-        newNote.notebook = (backMOC.object(with:(currentDefaultNotebook?.objectID)!)  as! Notebook)
+        newNote.notebook = (backMOC.object(with:(currentNotebook?.objectID)!)  as! Notebook)
         newNote.notebook?.title = nameNotebookTextField.text
         newNote.title = nameNoteTextField.text
         newNote.content = noteTextView.text
