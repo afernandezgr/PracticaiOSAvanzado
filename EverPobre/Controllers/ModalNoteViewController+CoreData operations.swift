@@ -160,7 +160,13 @@ extension ModalNoteViewController {
             dismiss(animated: true, completion: nil)
         }
         else if tabBarCnt.selectedIndex == 2 { //setdefault
-
+            if self.fetchedResultControllerDefault.fetchedObjects?.count == 0 {
+                showError(title: "Warning!", message: "There are not notebooks to be selected as default")
+                return
+            }
+            
+            
+            
             let indexPath = IndexPath(row: notebookDefaultPicker.selectedRow(inComponent: 0),  section: 0)
             let newDefaultNotebook  = self.fetchedResultControllerDefault.object(at: indexPath as IndexPath) as Notebook
             

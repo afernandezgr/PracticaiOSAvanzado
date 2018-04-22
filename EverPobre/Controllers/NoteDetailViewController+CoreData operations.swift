@@ -15,6 +15,11 @@ extension NoteDetailViewController {
     
      func createNewNote() {
         
+        if   currentNotebook == nil {
+            showError(title: "Warning", message: "You need to create a notebook before create note")
+            return
+        }
+        
         let backMOC = CoreDataManager.sharedManager.persistentContainer.newBackgroundContext()
         
         //save general attributes
